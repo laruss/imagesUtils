@@ -1,0 +1,6 @@
+Pillow~=10.0.0
+requests~=2.31.0
+transformers~=4.31.0
+pydantic~=2.1.1
+python-decouple~=3.8
+Google-Images-Search~=1.4.6
