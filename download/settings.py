@@ -2,11 +2,7 @@ from typing import Union
 
 from decouple import config
 
-from core.utils import get_root_path
-
-final_folder = f"{get_root_path()}/static"
-images_folder = f"{final_folder}/images"
-data_file = f"{final_folder}/data.json"
+from core.settings import *
 
 images_limit = 50
 prompt = "here some prompt"

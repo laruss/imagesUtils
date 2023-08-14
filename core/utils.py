@@ -7,6 +7,17 @@ def get_root_path():
     return os.path.dirname(os.path.abspath(__file__) + '/../')
 
 
+def create_folder_if_not_exists(path: str) -> None:
+    """
+    Creates a folder if it does not exist.
+
+    :param path: path to the folder
+    :return: None
+    """
+    if not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
+
+
 def write_to_file(
         data,
         path: str,
@@ -82,19 +93,22 @@ def write_json_to_file(
     write_to_file(json.dumps(data, indent=4), path, create_if_not_exist, rewrite, silent)
 
 
-def read_json_from_file(path: str, silent=False) -> Union[dict, list]:
+def read_json_from_file(path: str, silent=False, error_on_invalid_json=True) -> Union[dict, list, None]:
     """
     Reads JSON data from a file.
 
     :param path: path to the json file
     :param silent: boolean, whether to print a message after writing
+    :param error_on_invalid_json: whether to raise an error if the file does not contain valid JSON or not exists
     :return: dict or list
     """
-    file_content = read_from_file(path, silent=silent)
-
     try:
+        file_content = read_from_file(path, silent=silent)
         data = json.loads(file_content)
-    except json.JSONDecodeError:
-        raise ValueError(f"The file '{path}' does not contain valid JSON.")
+    except Exception as e:
+        if error_on_invalid_json:
+            raise e
+        else:
+            data = None
 
     return data
