@@ -12,8 +12,6 @@ change the `./download/.env.sample` to `./download/.env` and fill all the requir
 
 you can run the script with arguments or, changing the `./download/settings.py` file.
 
-```bash
-
 ## How to use
 
 ```bash
