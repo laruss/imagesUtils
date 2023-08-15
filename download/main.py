@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
+
 import argparse
 from enum import Enum
 
 import core
 
-import download.settings as settings
-from download import scrolller, pexels, utils, google
+from download import scrolller, pexels, utils, google, settings
 
 parser = argparse.ArgumentParser()
 
@@ -37,7 +38,10 @@ def main():
     else:
         raise Exception("Unknown source")
 
-    for post in posts:
+    for i, post in enumerate(posts):
+        if args.limit and i >= args.limit:
+            break
+
         data = core.utils.read_json_from_file(core.settings.data_file, args.silent, False) or {}
         if str(post.id) in data.keys():
             if not args.silent:
@@ -45,8 +49,8 @@ def main():
             continue
 
         utils.download_image(post, args.silent)
-        core.utils.write_json_to_file({post.id: post.model_dump()}, core.settings.data_file,
-                                      rewrite=True, silent=args.silent)
+        data.update({post.id: post.model_dump()})
+        core.utils.write_json_to_file(data, core.settings.data_file, rewrite=True, silent=args.silent)
 
 
 if __name__ == "__main__":

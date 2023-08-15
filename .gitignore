@@ -161,4 +161,4 @@ cython_debug/
 
 # Custom for this project
 .DS_Store
-./static/*
+/static/

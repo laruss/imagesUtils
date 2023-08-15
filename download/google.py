@@ -4,7 +4,7 @@ from typing import List
 from google_images_search import GoogleImagesSearch
 
 from download import settings
-from download.models.ProcessedPost import ProcessedPost
+from core.ProcessedPost import ProcessedPost
 
 
 def get_posts(limit: int = 50, query: str = "people", silent: bool = False) -> List[ProcessedPost]:

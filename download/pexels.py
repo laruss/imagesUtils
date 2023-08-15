@@ -3,7 +3,7 @@ from typing import List
 import requests
 
 from download import settings
-from download.models.ProcessedPost import ProcessedPost
+from core.ProcessedPost import ProcessedPost
 from download.models.pexels.Result import Result
 
 

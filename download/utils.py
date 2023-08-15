@@ -1,10 +1,8 @@
 import requests
 from PIL import Image
 
-from core.utils import *
-
 from download import settings
-from download.models.ProcessedPost import ProcessedPost
+from core.ProcessedPost import ProcessedPost
 
 
 def download_image(post: ProcessedPost, silent: bool = True) -> None:

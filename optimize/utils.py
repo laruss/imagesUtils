@@ -26,7 +26,7 @@ def to_webp(quality: int = 80, delete_original: bool = False, silent: bool = Fal
                 print(f"Image {image_file} was converted. {i + 1} of {len(image_files)}")
 
     if not silent:
-        print(f"Process is  finished! {len(image_files)} of images were converted.")
+        print(f"Process is finished! {len(image_files)} of images were converted.")
 
 
 def minimize(

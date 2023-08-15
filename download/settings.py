@@ -9,7 +9,7 @@ prompt = "here some prompt"
 
 
 class pexels:
-    api_key: str = config['PEXELS_API_KEY']
+    api_key: str = config('PEXELS_API_KEY')
 
 
 class scroller:
@@ -18,5 +18,5 @@ class scroller:
 
 
 class google:
-    api_key: str = config['GOOGLE_API_KEY']
-    cx: str = config['GOOGLE_CX']
+    api_key: str = config('GOOGLE_API_KEY')
+    cx: str = config('GOOGLE_CX')

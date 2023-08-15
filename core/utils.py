@@ -1,10 +1,11 @@
 import json
 import os
+import pathlib
 from typing import Union, Any
 
 
 def get_root_path():
-    return os.path.dirname(os.path.abspath(__file__) + '/../')
+    return pathlib.Path(__file__).parent.parent.resolve()
 
 
 def create_folder_if_not_exists(path: str) -> None:
@@ -16,6 +17,7 @@ def create_folder_if_not_exists(path: str) -> None:
     """
     if not os.path.exists(path):
         os.makedirs(path, exist_ok=True)
+        print(f"Folder '{path}' was created.")
 
 
 def write_to_file(
