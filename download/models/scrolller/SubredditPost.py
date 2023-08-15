@@ -3,7 +3,7 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 from download.models.scrolller.MediaSource import MediaSource
-from core.ProcessedPost import ProcessedPost
+from core.ProcessedItem import ProcessedItem
 
 
 class SubredditPost(BaseModel):
@@ -33,5 +33,5 @@ class SubredditPost(BaseModel):
     def get_biggest_media(self):
         return max(self.mediaSources, key=lambda x: x.width * x.height)
 
-    def get_processed(self) -> ProcessedPost:
-        return ProcessedPost(id=self.id, title=self.title, media=self.get_biggest_media.url)
+    def get_processed(self) -> ProcessedItem:
+        return ProcessedItem(id=self.id, title=self.title, media=self.get_biggest_media.url)

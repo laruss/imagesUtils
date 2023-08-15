@@ -5,7 +5,7 @@ from decouple import config
 from core.settings import *
 
 images_limit = 50
-prompt = "here some prompt"
+prompt = "fashion"
 
 
 class pexels:

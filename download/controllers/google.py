@@ -4,10 +4,10 @@ from typing import List
 from google_images_search import GoogleImagesSearch
 
 from download import settings
-from core.ProcessedPost import ProcessedPost
+from core.ProcessedItem import ProcessedItem
 
 
-def get_posts(limit: int = 50, query: str = "people", silent: bool = False) -> List[ProcessedPost]:
+def get_items(limit: int = 50, query: str = "people", silent: bool = False) -> List[ProcessedItem]:
     gis = GoogleImagesSearch(settings.google.api_key, settings.google.cx)
 
     _search_params = {
@@ -27,4 +27,4 @@ def get_posts(limit: int = 50, query: str = "people", silent: bool = False) -> L
     if not silent:
         print(f"Got {len(gis.results())} items")
 
-    return [ProcessedPost(id=int(time.time()), title="no title", media=image.url) for image in gis.results()]
+    return [ProcessedItem(id=int(time.time()), title="no title", media=image.url) for image in gis.results()]

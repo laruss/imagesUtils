@@ -3,7 +3,7 @@ from typing import List
 import requests
 
 from download import settings
-from core.ProcessedPost import ProcessedPost
+from core.ProcessedItem import ProcessedItem
 from download.models.pexels.Result import Result
 
 
@@ -28,7 +28,7 @@ def _get_items(query: str = "people", limit: int = 50, silent: bool = False) -> 
     return Result(**result)
 
 
-def get_posts(limit: int = 50, query: str = "people", silent: bool = False) -> List[ProcessedPost]:
+def get_items(limit: int = 50, query: str = "people", silent: bool = False) -> List[ProcessedItem]:
     photos = _get_items(limit=limit, query=query, silent=silent).photos
 
-    return [ProcessedPost(id=item.id, title=item.alt, media=item.src['original']) for item in photos]
+    return [ProcessedItem(id=item.id, title=item.alt, media=item.src['original']) for item in photos]

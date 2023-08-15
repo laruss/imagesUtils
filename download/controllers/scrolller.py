@@ -2,7 +2,8 @@ from typing import List
 
 import requests
 
-from core.ProcessedPost import ProcessedPost
+from core.ProcessedItem import ProcessedItem
+from download import settings
 from download.models.scrolller.Result import Result
 
 query = [
@@ -102,9 +103,8 @@ def _get_items(
     return Result(**result)
 
 
-def get_posts(nsfw: bool = False, limit: int = 50, subreddit: str = None, silent: bool = False) -> List[ProcessedPost]:
-    result_ = _get_items(nsfw=nsfw, limit=limit, subreddit=subreddit, silent=silent)
-
+def get_items(limit: int = 50, query: str = None, silent: bool = False) -> List[ProcessedItem]:
+    result_ = _get_items(nsfw=settings.scroller.nsfw, limit=limit, subreddit=settings.scroller.subreddit, silent=silent)
     posts_list = [item.get_processed_posts() for item in result_.items]
 
     return [post for posts in posts_list for post in posts]

@@ -5,19 +5,21 @@ from enum import Enum
 
 import core
 
-from download import scrolller, pexels, utils, google, settings
+from download import utils, settings
+from download.controllers import google, pexels, scrolller, pinterest
 
 parser = argparse.ArgumentParser()
 
 
 class sources(Enum):
-    pexels = 'pexels'
-    scrolller = 'scrolller'
-    google = 'google'
+    pexels = pexels
+    scrolller = scrolller
+    google = google
+    pinterest = pinterest
 
 
 def add_arguments():
-    parser.add_argument("--source", help="source site", choices=[source.value for source in sources],
+    parser.add_argument("--source", help="source site", choices=[source.name for source in sources],
                         required=True)
     parser.add_argument("--limit", help="limit of posts", type=int, default=settings.images_limit)
     parser.add_argument("--prompt", help="prompt for request", type=str, default=settings.prompt)
@@ -28,15 +30,8 @@ def main():
     add_arguments()
     args = parser.parse_args()
 
-    if args.source == sources.scrolller.value:
-        posts = scrolller.get_posts(
-            nsfw=settings.scroller.nsfw, limit=args.limit, subreddit=settings.scroller.subreddit, silent=args.silent)
-    elif args.source == sources.pexels.value:
-        posts = pexels.get_posts(limit=args.limit, query=args.prompt, silent=args.silent)
-    elif args.source == sources.google.value:
-        posts = google.get_posts(limit=args.limit, query=args.prompt, silent=args.silent)
-    else:
-        raise Exception("Unknown source")
+    source = sources[args.source].value
+    posts = source.get_items(limit=args.limit, query=args.prompt, silent=args.silent)
 
     for i, post in enumerate(posts):
         if args.limit and i >= args.limit:

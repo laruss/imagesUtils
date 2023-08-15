@@ -2,10 +2,10 @@ import requests
 from PIL import Image
 
 from download import settings
-from core.ProcessedPost import ProcessedPost
+from core.ProcessedItem import ProcessedItem
 
 
-def download_image(post: ProcessedPost, silent: bool = True) -> None:
+def download_image(post: ProcessedItem, silent: bool = True) -> None:
     if not silent:
         print(f"Downloading image: {post.title}")
 

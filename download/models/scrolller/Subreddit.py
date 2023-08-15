@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
-from core.ProcessedPost import ProcessedPost
+from core.ProcessedItem import ProcessedItem
 from download.models.scrolller.SubredditPost import SubredditPost
 
 
@@ -37,5 +37,5 @@ class Subreddit(BaseModel):
     def posts_quantity(self):
         return len(self.children.items)
 
-    def get_processed_posts(self) -> List[ProcessedPost]:
+    def get_processed_posts(self) -> List[ProcessedItem]:
         return [post.get_processed() for post in self.children.items]
