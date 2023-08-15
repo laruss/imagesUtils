@@ -1,3 +1,4 @@
+import logging
 import time
 from typing import List
 
@@ -7,7 +8,10 @@ from download import settings
 from core.ProcessedItem import ProcessedItem
 
 
-def get_items(limit: int = 50, query: str = "people", silent: bool = False) -> List[ProcessedItem]:
+logger = logging.getLogger()
+
+
+def get_items(limit: int = 50, query: str = "people") -> List[ProcessedItem]:
     gis = GoogleImagesSearch(settings.google.api_key, settings.google.cx)
 
     _search_params = {
@@ -24,7 +28,6 @@ def get_items(limit: int = 50, query: str = "people", silent: bool = False) -> L
 
     gis.search(search_params=_search_params)
 
-    if not silent:
-        print(f"Got {len(gis.results())} items")
+    logger.info(f"Fetching items from google.com with query '{query}'")
 
     return [ProcessedItem(id=int(time.time()), title="no title", media=image.url) for image in gis.results()]

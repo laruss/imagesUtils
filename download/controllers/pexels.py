@@ -1,15 +1,18 @@
-from typing import List
-
+import logging
 import requests
+
+from typing import List
 
 from download import settings
 from core.ProcessedItem import ProcessedItem
 from download.models.pexels.Result import Result
 
+logger = logging.getLogger()
 
-def _get_items(query: str = "people", limit: int = 50, silent: bool = False) -> Result:
-    if not silent:
-        print(f"Getting {limit} items from pexels")
+
+def _get_items(query: str = "people", limit: int = 50) -> Result:
+    logger.info(f"Getting {limit} items from pexels")
+
     headers = {
         "Authorization": settings.pexels.api_key,
     }
@@ -22,13 +25,12 @@ def _get_items(query: str = "people", limit: int = 50, silent: bool = False) -> 
 
     result = response.json()
 
-    if not silent:
-        print(f"Got {len(result['photos'])} items")
+    logger.info(f"Got {len(result['photos'])} items")
 
     return Result(**result)
 
 
-def get_items(limit: int = 50, query: str = "people", silent: bool = False) -> List[ProcessedItem]:
-    photos = _get_items(limit=limit, query=query, silent=silent).photos
+def get_items(limit: int = 50, query: str = "people") -> List[ProcessedItem]:
+    photos = _get_items(limit=limit, query=query).photos
 
     return [ProcessedItem(id=item.id, title=item.alt, media=item.src['original']) for item in photos]

@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 import requests
@@ -5,6 +6,8 @@ import requests
 from core.ProcessedItem import ProcessedItem
 from download import settings
 from download.models.scrolller.Result import Result
+
+logger = logging.getLogger()
 
 query = [
     "query DiscoverSubredditsQuery( $filter: MediaFilter $limit: Int $iterator: String ) { discoverSubreddits( ",
@@ -68,10 +71,8 @@ def _get_items(
         iterator: str = None,
         limit: int = 50,
         nsfw: bool = False,
-        subreddit: str = None,
-        silent: bool = False) -> Result:
-    if not silent:
-        print(f"Fetching items from scrolller.com with iterator {iterator}")
+        subreddit: str = None) -> Result:
+    logger.info(f"Fetching items from scrolller.com with iterator {iterator}")
 
     if subreddit:
         return _get_items_by_subreddit(subreddit)
@@ -97,14 +98,13 @@ def _get_items(
 
     result = response.json()["data"]["discoverSubreddits"]
 
-    if not silent:
-        print(f"Got {len(result['items'])} items")
+    logger.info(f"Got {len(result['items'])} items")
 
     return Result(**result)
 
 
-def get_items(limit: int = 50, query: str = None, silent: bool = False) -> List[ProcessedItem]:
-    result_ = _get_items(nsfw=settings.scroller.nsfw, limit=limit, subreddit=settings.scroller.subreddit, silent=silent)
+def get_items(limit: int = 50, query: str = None) -> List[ProcessedItem]:
+    result_ = _get_items(nsfw=settings.scroller.nsfw, limit=limit, subreddit=settings.scroller.subreddit)
     posts_list = [item.get_processed_posts() for item in result_.items]
 
     return [post for posts in posts_list for post in posts]

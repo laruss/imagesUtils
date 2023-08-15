@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
+import logging
 from enum import Enum
 
 import core
+from core.utils import set_logger
 
 from download import utils, settings
 from download.controllers import google, pexels, scrolller, pinterest
@@ -30,22 +32,23 @@ def main():
     add_arguments()
     args = parser.parse_args()
 
+    set_logger(not args.silent)
+
     source = sources[args.source].value
-    posts = source.get_items(limit=args.limit, query=args.prompt, silent=args.silent)
+    posts = source.get_items(limit=args.limit, query=args.prompt)
 
     for i, post in enumerate(posts):
         if args.limit and i >= args.limit:
             break
 
-        data = core.utils.read_json_from_file(core.settings.data_file, args.silent, False) or {}
+        data = core.utils.read_json_from_file(core.settings.data_file, False) or {}
         if str(post.id) in data.keys():
-            if not args.silent:
-                print(f"Skipping {post.id}, already in saved data")
+            logging.info(f"Skipping {post.id}, already in saved data")
             continue
 
-        utils.download_image(post, args.silent)
+        utils.download_image(post)
         data.update({post.id: post.model_dump()})
-        core.utils.write_json_to_file(data, core.settings.data_file, rewrite=True, silent=args.silent)
+        core.utils.write_json_to_file(data, core.settings.data_file, rewrite=True)
 
 
 if __name__ == "__main__":

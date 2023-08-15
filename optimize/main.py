@@ -1,5 +1,6 @@
 import argparse
 
+from core.utils import set_logger
 from optimize import utils, settings
 
 parser = argparse.ArgumentParser()
@@ -17,11 +18,12 @@ def main():
     args = parser.parse_args()
     silent = args.silent or settings.silent
 
+    set_logger(not silent)
+
     if args.method == methods[0]:
-        utils.to_webp(settings.quality, settings.delete_original, silent=silent)
+        utils.to_webp(settings.quality, settings.delete_original)
     elif args.method == methods[1]:
-        utils.minimize(settings.image_filter_size_kb, settings.image_final_size_kb, settings.file_extension,
-                       silent=silent)
+        utils.minimize(settings.image_filter_size_kb, settings.image_final_size_kb, settings.file_extension)
     else:
         raise Exception("Unknown method")
 

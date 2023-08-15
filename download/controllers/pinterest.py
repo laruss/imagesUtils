@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Dict, Literal, List
 
 import requests
@@ -7,6 +8,8 @@ from core.ProcessedItem import ProcessedItem
 from download.models.pinterest import Options, Model
 
 URL = 'https://pinterest.com/resource/BaseSearchResource/get/'
+
+logger = logging.getLogger()
 
 
 def _get_data(query: str = None, options: Options = None) -> Dict[Literal["options", "context"], dict]:
@@ -23,11 +26,10 @@ def _get_data(query: str = None, options: Options = None) -> Dict[Literal["optio
     }
 
 
-def _get_model(data: Dict[Literal["options", "context"], dict], silent: bool = False) -> Model:
+def _get_model(data: Dict[Literal["options", "context"], dict]) -> Model:
     source_url = "/search/pins/?rs=ac"
 
-    if not silent:
-        print(f"Fetching items from pinterest.com with query '{data['options']['query']}'")
+    logger.info(f"Fetching items from pinterest.com with query '{data['options']['query']}'")
 
     response = requests.get(URL, params={"source_url": source_url, "data": json.dumps(data)}, headers={})
 
@@ -38,23 +40,21 @@ def _get_model(data: Dict[Literal["options", "context"], dict], silent: bool = F
 
     model = Model(**resp_data)
 
-    if not silent:
-        print(f"Got {len(model.resource_response.data.results)} items")
+    logger.info(f"Got {len(model.resource_response.data.results)} items")
 
     return model
 
 
-def get_items(limit: int = 50, query: str = "people", silent: bool = False) -> List[ProcessedItem]:
+def get_items(limit: int = 50, query: str = "people") -> List[ProcessedItem]:
     processed_items = []
     data = _get_data(query=query)
 
     while len(processed_items) < limit:
-        model = _get_model(data, silent=silent)
+        model = _get_model(data)
         for item in model.resource_response.data.results:
             processed_items.append(ProcessedItem(id=item.id, title=item.title, media=item.images.orig.url))
         data = _get_data(options=model.resource.options)
 
-    if not silent:
-        print(f"Got {len(processed_items)} items")
+    logger.info(f"Got {len(processed_items)} items")
 
     return processed_items
