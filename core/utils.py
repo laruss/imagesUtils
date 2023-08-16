@@ -4,22 +4,41 @@ import os
 import pathlib
 from typing import Union, Any
 
-logger = logging.getLogger()
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+
+
+def get_logger() -> logging.Logger:
+    logger_ = logging.getLogger("images-utils")
+
+    return logger_
+
+
+logger = get_logger()
 
 
 def get_root_path():
     return pathlib.Path(__file__).parent.parent.resolve()
 
 
-def set_logger(state: bool = True):
+def set_logger(state: bool = True, filename: str = None):
     """
     Sets the logger state.
 
     :param state: boolean, whether to switch the logger on or off
+    :param filename: path to the log file, if None, the log will be printed to the console
     :return: None
     """
-    logger.setLevel(logging.INFO)
-    logger.propagate = state
+    if not state:
+        logger.setLevel(logging.CRITICAL + 1)
+
+    if filename is not None:
+        handler = logging.FileHandler(filename)
+        handler.setLevel(logging.INFO)
+        logger.addHandler(handler)
 
 
 def create_folder_if_not_exists(path: str) -> None:
@@ -120,3 +139,17 @@ def read_json_from_file(path: str, error_on_invalid_json=True) -> Union[dict, li
             data = None
 
     return data
+
+
+def delete_file(path: str) -> None:
+    """
+    Deletes a file.
+
+    :param path: path to the file
+    :return: None
+    """
+    if not os.path.exists(path) or not os.path.isfile(path):
+        raise FileNotFoundError(f"The file '{path}' does not exist.")
+
+    os.remove(path)
+    logger.info(f"File '{path}' was deleted.")

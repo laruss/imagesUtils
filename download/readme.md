@@ -8,7 +8,7 @@ This submodule contains the scripts to download the images from some resources s
 pip install -r requirements.txt
 ```
 
-change the `./download/.env.sample` to `./download/.env` and fill all the required fields.
+change the `./download/.env.sample` to `./download/.env` and fill all the needed fields.
 
 you can run the script with arguments or, changing the `./download/settings.py` file.
 

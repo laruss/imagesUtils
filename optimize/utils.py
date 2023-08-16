@@ -1,12 +1,11 @@
-import logging
 import os
 
 from PIL import Image
 
 from core.settings import *
+from core.utils import get_logger
 
-
-logger = logging.getLogger()
+logger = get_logger()
 
 
 def to_webp(quality: int = 80, delete_original: bool = False) -> None:

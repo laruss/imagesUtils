@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
 import argparse
-import logging
 from enum import Enum
 
 import core
-from core.utils import set_logger
+from core.utils import set_logger, get_logger
 
 from download import utils, settings
 from download.controllers import google, pexels, scrolller, pinterest
 
 parser = argparse.ArgumentParser()
+logger = get_logger()
 
 
 class sources(Enum):
@@ -43,7 +43,7 @@ def main():
 
         data = core.utils.read_json_from_file(core.settings.data_file, False) or {}
         if str(post.id) in data.keys():
-            logging.info(f"Skipping {post.id}, already in saved data")
+            logger.info(f"Skipping {post.id}, already in saved data")
             continue
 
         utils.download_image(post)

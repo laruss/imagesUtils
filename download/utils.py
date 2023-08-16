@@ -1,13 +1,12 @@
-import logging
-
 import requests
 from PIL import Image
 
+from core.utils import get_logger
 from download import settings
 from core.ProcessedItem import ProcessedItem
 
 
-logger = logging.getLogger()
+logger = get_logger()
 
 
 def download_image(post: ProcessedItem) -> None:
