@@ -1,20 +1,29 @@
-from decouple import config
+import os
 
-from core.settings import *
+from decouple import Config, RepositoryEnv
 
-PROVIDER = 'google'  # 'yandex' || 'google'
-
-REMOTE_FOLDER_NAME = 'images_utils_data'
-ZIP_NAME = 'images_data.zip'
-
-DELETE_AFTER_ZIP = False
-DELETE_AFTER_UNZIP = False
-DELETE_REMOTE_ZIP_BEFORE_UPLOAD = True
+import core.settings
+from core.common import CommonSettings
 
 
-class yandex:
-    api_token = config('YANDEX_API_TOKEN')
+dot_env_path = os.path.dirname(os.path.abspath(__file__)) + '/.env'
+env_config = Config(RepositoryEnv(dot_env_path))
 
 
-class google:
+class yandex(CommonSettings):
+    api_token = env_config.get('YANDEX_API_TOKEN')
+
+
+class google(CommonSettings):
     local_server_port = 50607
+
+
+class Settings(core.settings.Settings):
+    provider = 'google'  # 'yandex' || 'google'
+    remote_folder_name = 'images_utils_data'
+    zip_name = 'images_data.zip'
+    delete_after_zip = False
+    delete_after_unzip = False
+    delete_remote_zip_before_upload = True
+    yandex = yandex()
+    google = google()

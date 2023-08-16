@@ -2,7 +2,7 @@ import requests
 from PIL import Image
 
 from core.utils import get_logger
-from download import settings
+from download.settings import Settings
 from core.ProcessedItem import ProcessedItem
 
 
@@ -13,7 +13,7 @@ def download_image(post: ProcessedItem) -> None:
     logger.info(f"Downloading image: {post.title}")
 
     raw_image = None
-    image_path = f"{settings.images_folder}/{post.id}.jpg"
+    image_path = f"{Settings.images_folder}/{post.id}.jpg"
 
     try:
         raw_image = Image.open(requests.get(post.media, stream=True).raw).convert('RGB')

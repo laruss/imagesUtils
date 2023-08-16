@@ -1,7 +1,8 @@
 import argparse
 
 from core.utils import set_logger
-from optimize import utils, settings
+from optimize import utils
+from optimize.settings import Settings
 
 parser = argparse.ArgumentParser()
 
@@ -16,14 +17,14 @@ def add_arguments():
 def main():
     add_arguments()
     args = parser.parse_args()
-    silent = args.silent or settings.silent
+    silent = args.silent or Settings.silent
 
     set_logger(not silent)
 
     if args.method == methods[0]:
-        utils.to_webp(settings.quality, settings.delete_original)
+        utils.to_webp(Settings.quality, Settings.delete_original)
     elif args.method == methods[1]:
-        utils.minimize(settings.image_filter_size_kb, settings.image_final_size_kb, settings.file_extension)
+        utils.minimize(Settings.image_filter_size_kb, Settings.image_final_size_kb, Settings.file_extension)
     else:
         raise Exception("Unknown method")
 

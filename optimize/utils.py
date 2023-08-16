@@ -2,27 +2,27 @@ import os
 
 from PIL import Image
 
-from core.settings import *
+from optimize.settings import Settings
 from core.utils import get_logger
 
 logger = get_logger()
 
 
 def to_webp(quality: int = 80, delete_original: bool = False) -> None:
-    if not os.path.exists(images_folder):
-        raise Exception(f"Folder {images_folder} does not exist.")
+    if not os.path.exists(Settings.images_folder):
+        raise Exception(f"Folder {Settings.images_folder} does not exist.")
 
-    image_files = [f for f in os.listdir(images_folder) if
-                   os.path.isfile(os.path.join(images_folder, f)) and f.lower().endswith(('png', 'jpg', 'jpeg'))]
+    image_files = [f for f in os.listdir(Settings.images_folder) if
+                   os.path.isfile(os.path.join(Settings.images_folder, f)) and f.lower().endswith(('png', 'jpg', 'jpeg'))]
 
     logger.info(f"Found {len(image_files)} images.")
 
     for i, image_file in enumerate(image_files):
-        with Image.open(os.path.join(images_folder, image_file)) as im:
-            destination_path = os.path.join(images_folder, os.path.splitext(image_file)[0] + ".webp")
+        with Image.open(os.path.join(Settings.images_folder, image_file)) as im:
+            destination_path = os.path.join(Settings.images_folder, os.path.splitext(image_file)[0] + ".webp")
             im.save(destination_path, "WEBP", quality=quality)
             if delete_original:
-                os.remove(os.path.join(images_folder, image_file))
+                os.remove(os.path.join(Settings.images_folder, image_file))
 
             logger.info(f"Image {image_file} was converted. {i + 1} of {len(image_files)}")
 
@@ -39,11 +39,11 @@ def minimize(
     def get_file_size_in_kb(filepath):
         return os.path.getsize(filepath) / 1024
 
-    image_files = [f for f in os.listdir(images_folder) if
-                   os.path.isfile(os.path.join(images_folder, f)) and f.lower().endswith(file_extension)]
+    image_files = [f for f in os.listdir(Settings.images_folder) if
+                   os.path.isfile(os.path.join(Settings.images_folder, f)) and f.lower().endswith(file_extension)]
 
     for image_file in image_files:
-        file_path = os.path.join(images_folder, image_file)
+        file_path = os.path.join(Settings.images_folder, image_file)
 
         if get_file_size_in_kb(file_path) > image_filter_size_kb:  # for images larger than file size
             with Image.open(file_path) as im:

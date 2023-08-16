@@ -29,5 +29,5 @@ Utils to upload images to cloud storages: [cloud](./cloud/readme.md) submodule.
 - [x] replace print with logging
 - [x] implement description module
 - [x] implement cloud module
-- [ ] add docker support
 - [ ] implement web interface
+- [ ] add docker support
