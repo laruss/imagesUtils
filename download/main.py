@@ -41,14 +41,14 @@ def main():
         if args.limit and i >= args.limit:
             break
 
-        data = core.utils.read_json_from_file(core.settings.data_file, False) or {}
+        data = core.utils.read_json_from_file(settings.data_file, False) or {}
         if str(post.id) in data.keys():
             logger.info(f"Skipping {post.id}, already in saved data")
             continue
 
         utils.download_image(post)
         data.update({post.id: post.model_dump()})
-        core.utils.write_json_to_file(data, core.settings.data_file, rewrite=True)
+        core.utils.write_json_to_file(data, settings.data_file, rewrite=True)
 
 
 if __name__ == "__main__":

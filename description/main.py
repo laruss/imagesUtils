@@ -10,6 +10,7 @@ from description.gpt import gpt
 parser = argparse.ArgumentParser()
 logger = get_logger()
 
+
 class methods(Enum):
     describe = "describe"
     delete_nsfw = "delete_nsfw"

@@ -22,9 +22,12 @@ Utils to optimize images: [optimize](./optimize/readme.md) submodule.
 
 Utils to create images descriptions: [description](./description/readme.md) submodule.
 
+Utils to upload images to cloud storages: [cloud](./cloud/readme.md) submodule.
+
 ## TODO
 
 - [x] replace print with logging
 - [x] implement description module
-- [ ] implement cloud module
+- [x] implement cloud module
+- [ ] add docker support
 - [ ] implement web interface
