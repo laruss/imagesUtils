@@ -1,5 +1,8 @@
+from typing import Literal
+
 from flask import send_file
 
+from core.ProcessedItem import ProcessedItem
 from core.settings import Settings
 from core.utils import read_json_from_file, write_json_to_file
 
@@ -67,3 +70,36 @@ def set_image_data(image_id, data):
     write_json_to_file(data_json, Settings.data_file, rewrite=True)
 
     return data_json[str(image_id)]
+
+
+def generate_image_description(image_id: str, source: Literal['replicate', 'transformers']):
+    data_json = read_json_from_file(Settings.data_file)
+    item = ProcessedItem(**data_json[str(image_id)])
+    item.describe(source)
+
+
+def process_by_gpt(image_id: str, prompt: str,
+                   model: Literal['gpt-4', 'gpt-3.5-turbo'] = 'gpt-3.5-turbo',
+                   used_gpt: Literal['gpt4free', 'openai'] = 'gpt4free'
+                   ):
+    data_json = read_json_from_file(Settings.data_file)
+    item = ProcessedItem(**data_json[str(image_id)])
+    item.process_by_gpt(prompt, model, used_gpt)
+
+
+def to_webp(image_id: str, quality: int = 80, delete_original: bool = True):
+    data_json = read_json_from_file(Settings.data_file)
+    item = ProcessedItem(**data_json[str(image_id)])
+    item.to_webp(quality, delete_original)
+
+
+def optimize_image(image_id: str, image_final_size_kb: int = 512):
+    data_json = read_json_from_file(Settings.data_file)
+    item = ProcessedItem(**data_json[str(image_id)])
+    item.optimize(image_final_size_kb)
+
+
+def gpt2json(image_id: str):
+    data_json = read_json_from_file(Settings.data_file)
+    item = ProcessedItem(**data_json[str(image_id)])
+    item.gpt2json()
