@@ -24,10 +24,14 @@ Utils to create images descriptions: [description](./description/readme.md) subm
 
 Utils to upload images to cloud storages: [cloud](./cloud/readme.md) submodule.
 
+Web interface for all modules: [web_interface](./web_interface/readme.md) submodule.
+
 ## TODO
 
 - [x] replace print with logging
 - [x] implement description module
 - [x] implement cloud module
-- [ ] implement web interface
+- [x] implement web interface
+- [ ] fix settings to use them in web interface
+- [ ] fix updating settings via web interface
 - [ ] add docker support

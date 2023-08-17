@@ -30,8 +30,15 @@ class ProcessedItem(BaseModel):
                        ) -> str:
         from description.gpt import gpt
 
+        for prmpt in Prompts:
+            if prmpt.value == prompt:
+                prompt = prmpt
+                break
+        else:
+            raise Exception(f"Prompt {prompt} not found")
+
         if not self.gptText:
-            self.gptText = gpt(self, Prompts[prompt], model, used_gpt)
+            self.gptText = gpt(self, prompt, model, used_gpt)
 
             self.save()
 
@@ -91,6 +98,11 @@ class ProcessedItem(BaseModel):
         self.save_image()
 
         logger.info(f"Image data for '{self.id}' successfully saved.")
+
+    def delete(self):
+        from core.images_utils import delete_image_data
+
+        delete_image_data(self.id)
 
     def save_image(self) -> None:
         from download.utils import download_image

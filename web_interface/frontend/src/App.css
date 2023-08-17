@@ -1,0 +1,10 @@
+@import "~react-image-gallery/styles/css/image-gallery.css";
+
+.App {
+  text-align: center;
+}
+
+.image-gallery-image {
+  height: 85vh;
+}
+

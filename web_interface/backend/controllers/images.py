@@ -5,10 +5,11 @@ from flask import send_file
 from core.ProcessedItem import ProcessedItem
 from core.settings import Settings
 from core.utils import read_json_from_file, write_json_to_file
+from web_interface.backend.settings import data_schema_file_path
 
 
 def _get_data_schema():
-    scheme = read_json_from_file(f"{Settings.data_file}.schema.json", False)
+    scheme = read_json_from_file(data_schema_file_path, False)
 
     return scheme
 
@@ -24,7 +25,7 @@ def _create_data_scheme_if_not_exists(data: dict):
 
     schema = builder.to_schema()
 
-    write_json_to_file(schema, f"{Settings.data_file}.schema.json", True, True)
+    write_json_to_file(schema, data_schema_file_path, True, True)
 
 
 def _get_image_path_by_id_without_extension(image_id: str):
@@ -76,6 +77,12 @@ def generate_image_description(image_id: str, source: Literal['replicate', 'tran
     data_json = read_json_from_file(Settings.data_file)
     item = ProcessedItem(**data_json[str(image_id)])
     item.describe(source)
+
+
+def delete_image(image_id: str):
+    data_json = read_json_from_file(Settings.data_file)
+    item = ProcessedItem(**data_json[str(image_id)])
+    item.delete()
 
 
 def process_by_gpt(image_id: str, prompt: str,

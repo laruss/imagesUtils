@@ -25,6 +25,11 @@ def get_image(image_id):
 
 @images_bp.route('/<image_id>', methods=['DELETE'])
 def delete_image(image_id):
+    try:
+        controller.delete_image(image_id)
+    except Exception as e:
+        return flask.jsonify({'error': str(e)}), 400
+
     return flask.jsonify({'success': True})
 
 
@@ -57,11 +62,11 @@ def generate_image_description(image_id):
     source = flask.request.args.get('source') or settings_data['description']['image_to_text_engine']
 
     try:
-        result = controller.generate_image_description(image_id, source)
+        controller.generate_image_description(image_id, source)
     except Exception as e:
         return flask.jsonify({'error': str(e)}), 400
 
-    return flask.jsonify(result), 200
+    return flask.jsonify({"success": True}), 200
 
 
 @images_bp.route('/<image_id>/gpt', methods=['PUT'])
