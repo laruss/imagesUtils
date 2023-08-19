@@ -2,13 +2,12 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {Paper} from "@mui/material";
+import {ListItem, Paper} from "@mui/material";
 import Divider from "@mui/material/Divider";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {selectCurrentImage, selectImages, setCurrentImage} from "../../app/slices/imagesSlice";
-import ImagesActionsList from "./ImagesActionsList";
+import ImagesActions from "./ImagesActions";
 
 export default function ImagesList() {
     const dispatch = useAppDispatch();
@@ -29,25 +28,25 @@ export default function ImagesList() {
         <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
             <Paper style={{ padding: 20, marginBottom: 20, height: '80vh' }}>
                 <Divider>Images</Divider>
-                <List component="nav" aria-label="main mailbox folders" style={{height: '60vh', overflow: 'auto'}}>
+                <List component="nav" aria-label="main mailbox folders" style={{height: '76vh', overflow: 'auto'}}>
                     {
                         images && images.map((image: string) => {
                             return (
-                                <ListItemButton
-                                    key={image}
-                                    selected={currentImage === image}
-                                    onClick={(event) => handleListItemClick(event, image)}
-                                >
-                                    <ListItemIcon>
-                                    </ListItemIcon>
-                                    <ListItemText primary={image} />
-                                </ListItemButton>
+                                <ListItem>
+                                    <ListItemButton
+                                        key={image}
+                                        selected={currentImage === image}
+                                        onClick={(event) => handleListItemClick(event, image)}
+                                    >
+                                        <ListItemText primary={image}/>
+                                    </ListItemButton>
+                                </ListItem>
                             )
                         })
                     }
                 </List>
-                <ImagesActionsList/>
             </Paper>
+            <ImagesActions/>
         </Box>
     );
 }

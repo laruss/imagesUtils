@@ -1,112 +1,99 @@
-from typing import Literal
-
 from flask import send_file
 
 from core.ProcessedItem import ProcessedItem
-from core.settings import Settings
+from core.images_utils import get_image_path_by_id
 from core.utils import read_json_from_file, write_json_to_file
-from web_interface.backend.settings import data_schema_file_path
+from web_interface.backend.controllers.settings import get_settings_as_model
+from web_interface.backend.settings import image_data_schema_file_path
 
 
 def _get_data_schema():
-    scheme = read_json_from_file(data_schema_file_path, False)
-
-    return scheme
+    return read_json_from_file(image_data_schema_file_path, False)
 
 
-def _create_data_scheme_if_not_exists(data: dict):
-    from genson import SchemaBuilder
+def _create_data_schema() -> dict:
+    from core.ProcessedItem import ProcessedItem
 
-    if _get_data_schema() is not None:
-        return
+    schema = ProcessedItem.model_json_schema()
 
-    builder = SchemaBuilder()
-    builder.add_object(data)
+    write_json_to_file(schema, image_data_schema_file_path, True, True)
 
-    schema = builder.to_schema()
-
-    write_json_to_file(schema, data_schema_file_path, True, True)
-
-
-def _get_image_path_by_id_without_extension(image_id: str):
-    import glob
-
-    return glob.glob(f"{Settings.images_folder}/{image_id}.*")[0]
+    return schema
 
 
 def get_images_list():
-    data_json = read_json_from_file(Settings.data_file)
+    settings = get_settings_as_model('core')
+    data_json = read_json_from_file(settings.data_file)
 
     return [id_ for id_ in data_json.keys()]
 
 
 def get_image(image_id):
-    path = _get_image_path_by_id_without_extension(image_id)
-
-    return send_file(path, mimetype='image/jpeg')
+    return send_file(get_image_path_by_id(image_id), mimetype='image/jpeg')
 
 
 def get_image_data(image_id):
-    data_json = read_json_from_file(Settings.data_file)
-
+    settings = get_settings_as_model('core')
+    data_json = read_json_from_file(settings.data_file)
     image_data = data_json[str(image_id)]
-
-    _create_data_scheme_if_not_exists(image_data)
 
     return image_data
 
 
+def _get_image_model(image_id) -> ProcessedItem:
+    return ProcessedItem(**get_image_data(image_id))
+
+
+def get_image_data_schema():
+    return _get_data_schema() or _create_data_schema()
+
+
 def set_image_data(image_id, data):
-    from jsonschema import validate
-
-    schema = _get_data_schema()
-
-    if schema is None:
-        raise Exception("Schema file is missing. Please, contact the developer.")
-
-    validate(data, schema)
-
-    data_json = read_json_from_file(Settings.data_file)
+    settings = get_settings_as_model('core')
+    data_json = read_json_from_file(settings.data_file)
+    _get_image_model(image_id)
     data_json[str(image_id)] = data
-    write_json_to_file(data_json, Settings.data_file, rewrite=True)
+    write_json_to_file(data_json, settings.data_file, rewrite=True)
 
     return data_json[str(image_id)]
 
 
-def generate_image_description(image_id: str, source: Literal['replicate', 'transformers']):
-    data_json = read_json_from_file(Settings.data_file)
-    item = ProcessedItem(**data_json[str(image_id)])
-    item.describe(source)
+def generate_image_description(image_id: str):
+    item = _get_image_model(image_id)
+    settings = get_settings_as_model('description')
+
+    item.describe(settings.description_settings)
 
 
 def delete_image(image_id: str):
-    data_json = read_json_from_file(Settings.data_file)
-    item = ProcessedItem(**data_json[str(image_id)])
+    item = _get_image_model(image_id)
+
     item.delete()
 
 
-def process_by_gpt(image_id: str, prompt: str,
-                   model: Literal['gpt-4', 'gpt-3.5-turbo'] = 'gpt-3.5-turbo',
-                   used_gpt: Literal['gpt4free', 'openai'] = 'gpt4free'
-                   ):
-    data_json = read_json_from_file(Settings.data_file)
-    item = ProcessedItem(**data_json[str(image_id)])
-    item.process_by_gpt(prompt, model, used_gpt)
+def process_by_gpt(image_id: str):
+    item = _get_image_model(image_id)
+    settings = get_settings_as_model('description')
+
+    item.process_by_gpt(settings.gpt_settings)
 
 
-def to_webp(image_id: str, quality: int = 80, delete_original: bool = True):
-    data_json = read_json_from_file(Settings.data_file)
-    item = ProcessedItem(**data_json[str(image_id)])
-    item.to_webp(quality, delete_original)
+def to_webp(image_id: str):
+    item = _get_image_model(image_id)
+    settings = get_settings_as_model('optimize')
+
+    item.to_webp(settings)
 
 
-def optimize_image(image_id: str, image_final_size_kb: int = 512):
-    data_json = read_json_from_file(Settings.data_file)
-    item = ProcessedItem(**data_json[str(image_id)])
-    item.optimize(image_final_size_kb)
+def optimize_image(image_id: str):
+    item = _get_image_model(image_id)
+    settings = get_settings_as_model('optimize')
+
+    item.optimize(settings)
 
 
 def gpt2json(image_id: str):
-    data_json = read_json_from_file(Settings.data_file)
-    item = ProcessedItem(**data_json[str(image_id)])
-    item.gpt2json()
+    item = _get_image_model(image_id)
+    settings = get_settings_as_model('description')
+
+    item.gpt2json(settings.gpt_settings)

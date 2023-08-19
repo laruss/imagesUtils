@@ -1,21 +1,29 @@
-from typing import Optional, Literal
+from enum import Enum
+from typing import Optional
 
 from core.ProcessedItem import ProcessedItem
 from core.utils import get_logger
-from description import settings
-from description.prompts import Prompts
+from description.prompt_schema import GPTResponseJSON
+from description.settings import GPTSettings
 
 logger = get_logger()
 
 
-def use_gpt(prompt: str, model: Literal['gpt-4', 'gpt-3.5-turbo'] = 'gpt-3.5-turbo') -> Optional[str]:
+def use_gpt(prompt: str, settings: GPTSettings = GPTSettings()) -> Optional[str]:
+    """
+    Use openai api to process prompt
+
+    :param prompt: formatted prompt
+    :param settings: GPTSettings
+    :return: response from openai api, str or None
+    """
     import openai
 
     openai.api_key = settings.openai.api_key
 
     try:
         response = openai.ChatCompletion.create(
-            model=model,
+            model=settings.model.value,
             messages=[{"role": "user", "content": prompt}]
         )
         choice = response.choices[0]
@@ -27,36 +35,66 @@ def use_gpt(prompt: str, model: Literal['gpt-4', 'gpt-3.5-turbo'] = 'gpt-3.5-tur
         logger.warning(f"Failed to use gpt, {e}")
 
 
-def use_gpt4free(prompt: str, model: Literal['gpt-4', 'gpt-3.5-turbo'] = 'gpt-3.5-turbo') -> Optional[str]:
+def use_gpt4free(prompt: str, settings: GPTSettings = GPTSettings()) -> Optional[str]:
+    """
+    Use gpt4free api to process prompt
+
+    :param prompt: formatted prompt
+    :param settings: GPTSettings
+    :return: str or None
+    """
     import g4f
 
     try:
         response = g4f.ChatCompletion.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}])
+            model=settings.model.value,
+            messages=[{"role": "user", "content": prompt}]
+        )
 
         return response
+
     except Exception as e:
         logger.warning(f"Failed to use gpt4free, {e}")
 
 
+def _get_prompt(item: ProcessedItem, settings: GPTSettings = GPTSettings()) -> str:
+    """
+    Get prompt for gpt
+
+    :param item: ProcessedItem
+    :param settings: GPTSettings
+    :return: prompt, str
+    """
+    prompt = settings.prompt.value.format(item=item)
+
+    if settings.use_prompt_schema:
+        prompt = f"{prompt}\nYou need to correspond to the following schema:\n{GPTResponseJSON.model_json_schema()}"
+
+    return prompt
+
+
 def gpt(
         item: ProcessedItem,
-        prompt: Prompts,
-        model: Literal['gpt-4', 'gpt-3.5-turbo'] = 'gpt-3.5-turbo',
-        used_gpt: Literal['gpt4free', 'openai'] = 'gpt4free'
+        settings: GPTSettings = GPTSettings()
 ) -> Optional[str]:
-    prompt_text = prompt.value.format(item=item)
-
-    gpt_map = {
-        'gpt4free': use_gpt4free,
-        'openai': use_gpt
+    mapper = {
+        "openai": use_gpt,
+        "gpt4free": use_gpt4free
     }
 
-    logger.info(f"Using {used_gpt} to process {item.id}, selected prompt is {prompt.name}.")
+    if settings.skip_gpt_if_gpted and item.gptText:
+        logger.info(f"Skipping {item.id}, already gpted")
 
-    resp_text = gpt_map[used_gpt](prompt_text, model)
+        return item.gptText
 
-    logger.info(f"Processed {item.id} by {used_gpt}, response is {resp_text}")
+    prompt_text = _get_prompt(item, settings)
+
+    service = settings.service.name
+
+    logger.info(f"Using {service} to process {item.id}, selected prompt is {settings.prompt.name}.")
+
+    resp_text = mapper[service](prompt_text, settings)
+
+    logger.info(f"Processed {item.id} by {service}, response is {resp_text}")
 
     return resp_text

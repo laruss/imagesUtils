@@ -1,65 +1,76 @@
-import {Paper} from "@mui/material";
+import {Box} from "@mui/material";
 import {api} from "../../app/api";
 import ActionButton, {ActionButtonProps} from "./ActionButton";
 import {useAppDispatch} from "../../app/hooks";
 import {setCurrentImage} from "../../app/slices/imagesSlice";
+import {MutationTrigger} from "@reduxjs/toolkit/dist/query/react/buildHooks";
 
 interface ImageActionsProps {
     image: string;
 }
 
-const ImageActions = ({image}: ImageActionsProps) => {
+const OneImageActions = ({image}: ImageActionsProps) => {
     const dispatch = useAppDispatch();
+
+    const onClick = (mutationTrigger: MutationTrigger<any>) => mutationTrigger({id: image});
 
     const buttons: ActionButtonProps[] = [
         {
-            image,
+            onClick,
             label: 'generate description',
             apiMutation: api.useUpdateImageDescriptionMutation,
             color: 'primary'
         },
         {
-            image,
+            onClick,
             label: 'process by gpt',
             apiMutation: api.useUpdateByGPTMutation,
             color: 'info'
         },
         {
-            image,
+            onClick,
             label: 'gpt to json',
             apiMutation: api.useSetJSONFromGPTMutation,
             color: 'primary'
         },
         {
-            image,
+            onClick,
             label: 'to webp',
             apiMutation: api.useConvertToWebPMutation,
             color: 'info'
         },
         {
-            image,
+            onClick,
             label: 'optimize size',
             apiMutation: api.useOptimizeImageMutation,
             color: 'primary'
         },
         {
-            image,
+            onClick,
             label: 'delete',
             apiMutation: api.useDeleteImageMutation,
             color: 'error',
-            method: () => { dispatch(setCurrentImage(null)) }
+            mutationCallBack: () => { dispatch(setCurrentImage(null)) }
         }
-    ]
+    ];
 
     return (
-        <Paper style={{paddingTop: '1em'}}>
+        <Box style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            zIndex: 5,
+            display: 'inline-flex',
+            width: '100vw',
+            justifyContent: 'center'
+        }}>
             {
                 buttons.map((button, index) => (
                     <ActionButton key={index} {...button}/>
                 ))
             }
-        </Paper>
+        </Box>
     );
 };
 
-export default ImageActions;
+export default OneImageActions;

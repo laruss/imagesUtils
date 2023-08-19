@@ -1,6 +1,10 @@
 export const isObjectEmpty = (obj: {[key:string]: any}) => {
     return Object.keys(obj).length === 0;
-}
+};
+
+export const areObjectsEqual = (obj1: {[key:string]: any}, obj2: {[key:string]: any}) => {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
+};
 
 export type ValueType = "number" | "boolean" | "object" | "string" | "null" | "array" | "unknown";
 

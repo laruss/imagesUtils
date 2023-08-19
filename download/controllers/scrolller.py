@@ -4,7 +4,7 @@ from typing import List
 import requests
 
 from core.ProcessedItem import ProcessedItem
-from download import settings
+from download.settings import DownloadSettings
 from download.models.scrolller.Result import Result
 
 logger = logging.getLogger()
@@ -62,7 +62,7 @@ def _get_items_by_subreddit(subreddit: str) -> Result:
     if response.status_code != 200:
         raise Exception(f"Error {response.status_code} while fetching items from scrolller.com")
 
-    print("Got items from scrolller.com")
+    logger.info("Got items from scrolller.com")
 
     return Result(**{"iterator": "", "items": [response.json()["data"]["getSubreddit"]]})
 
@@ -104,6 +104,7 @@ def _get_items(
 
 
 def get_items(limit: int = 50, query: str = None) -> List[ProcessedItem]:
+    settings = DownloadSettings()
     result_ = _get_items(nsfw=settings.scroller.nsfw, limit=limit, subreddit=settings.scroller.subreddit)
     posts_list = [item.get_processed_posts() for item in result_.items]
 

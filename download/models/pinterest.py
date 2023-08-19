@@ -47,11 +47,11 @@ class Pinner(BaseModel):
     full_name: Optional[str] = ''
     ads_only_profile_site: None
     image_large_url: Optional[str] = ''
-    is_ads_only_profile: bool
+    is_ads_only_profile: Optional[bool]
     image_small_url: Optional[str] = ''
     username: Optional[str] = ''
     follower_count: int
-    is_verified_merchant: bool
+    is_verified_merchant: Optional[bool]
     verified_identity: Dict[str, Any]
     id: Optional[str] = ''
     image_medium_url: Optional[str] = ''
@@ -66,11 +66,11 @@ class OfficialUserItem(BaseModel):
     full_name: Optional[str] = ''
     ads_only_profile_site: None
     image_large_url: Optional[str] = ''
-    is_ads_only_profile: bool
+    is_ads_only_profile: Optional[bool]
     image_small_url: Optional[str] = ''
     username: Optional[str] = ''
     follower_count: int
-    is_verified_merchant: bool
+    is_verified_merchant: Optional[bool]
     verified_identity: VerifiedIdentity
     id: Optional[str] = ''
     image_medium_url: Optional[str] = ''
@@ -81,7 +81,7 @@ class LinkDomainItem(BaseModel):
 
 
 class AggregatedPinData(BaseModel):
-    has_xy_tags: bool
+    has_xy_tags: Optional[bool]
 
 
 class ReactionCounts(BaseModel):
@@ -131,18 +131,18 @@ class Result(BaseModel):
     shopping_flags: List[int]
     access: List
     debug_info_html: None
-    is_promoted: bool
+    is_promoted: Optional[bool]
     tracking_params: Optional[str] = ''
-    promoted_is_lead_ad: bool
+    promoted_is_lead_ad: Optional[bool]
     image_crop: ImageCrop
     story_pin_data_id: None
     domain: Optional[str] = ''
     dominant_color: Optional[str] = ''
     title: Optional[str] = ''
-    is_eligible_for_related_products: bool
+    is_eligible_for_related_products: Optional[bool]
     story_pin_data: None
     description: Optional[str] = ''
-    is_prefetch_enabled: bool
+    is_prefetch_enabled: Optional[bool]
     id: Optional[str] = ''
     videos: None
     type: Optional[str] = ''
@@ -150,30 +150,30 @@ class Result(BaseModel):
     link: Optional[str]
     ad_match_reason: int
     grid_title: Optional[str] = ''
-    is_stale_product: bool
-    promoted_is_removable: bool
+    is_stale_product: Optional[bool]
+    promoted_is_removable: Optional[bool]
     rich_summary: Optional[RichSummaryItem]
-    is_uploaded: bool
+    is_uploaded: Optional[bool]
     sponsorship: None
     board: Board
-    is_eligible_for_pdp_plus: bool
+    is_eligible_for_pdp_plus: Optional[bool] = False
     attribution: None
     did_its: List
     pinner: Pinner
     image_signature: Optional[str] = ''
-    has_required_attribution_provider: bool
+    has_required_attribution_provider: Optional[bool]
     link_domain: Optional[LinkDomainItem]
     alt_text: Optional[str]
-    is_eligible_for_web_closeup: bool
-    is_eligible_for_filters: bool
-    is_oos_product: bool
+    is_eligible_for_web_closeup: Optional[bool]
+    is_eligible_for_filters: Optional[bool]
+    is_oos_product: Optional[bool]
     promoted_lead_form: None
     promoter: Optional[dict]
     aggregated_pin_data: AggregatedPinData
     call_to_action_text: None
-    is_downstream_promotion: bool
+    is_downstream_promotion: Optional[bool]
     created_at: Optional[str] = ''
-    is_eligible_for_pdp: bool
+    is_eligible_for_pdp: Optional[bool]
     carousel_data: None
     reaction_counts: ReactionCounts
     images: Images
@@ -188,12 +188,12 @@ class Tab(BaseModel):
 
 class Data(BaseModel):
     nag: Dict[str, Any]
-    should_append_global_search: bool
+    should_append_global_search: Optional[bool]
     results: List[Result]
     sensitivity: Dict[str, Any]
     tabs: List[Tab]
     query_l1_vertical_ids: List[int]
-    no_gift_wrap: bool
+    no_gift_wrap: Optional[bool]
 
 
 class SearchNag(BaseModel):
@@ -214,7 +214,7 @@ class SearchfeedTabs1(BaseModel):
 
 
 class Metadata(BaseModel):
-    use_sensitivity_from_stl: bool
+    use_sensitivity_from_stl: Optional[bool]
     searchfeed_tabs: SearchfeedTabs1
     query_l1_vertical_ids: List[int]
 
@@ -1315,7 +1315,7 @@ class ClientContext(BaseModel):
     analysis_ua: AnalysisUa
     app_type_detailed: int
     app_version: Optional[str] = ''
-    batch_exp: bool
+    batch_exp: Optional[bool]
     browser_locale: Optional[str] = ''
     browser_name: Optional[str] = ''
     browser_type: None
@@ -1325,7 +1325,7 @@ class ClientContext(BaseModel):
     country_from_ip: Optional[str] = ''
     csp_nonce: Optional[str] = ''
     current_url: Optional[str] = ''
-    debug: bool
+    debug: Optional[bool]
     deep_link: Optional[str] = ''
     enabled_advertiser_countries: List[str]
     experiment_hash: Optional[str] = ''
@@ -1335,13 +1335,13 @@ class ClientContext(BaseModel):
     impersonator_user_id: None
     invite_code: Optional[str] = ''
     invite_sender_id: Optional[str] = ''
-    is_authenticated: bool
+    is_authenticated: Optional[bool]
     is_bot: Optional[str] = ''
-    is_internal_ip: bool
-    is_full_page: bool
-    is_mobile_agent: bool
-    is_sterling_on_steroids: bool
-    is_tablet_agent: bool
+    is_internal_ip: Optional[bool]
+    is_full_page: Optional[bool]
+    is_mobile_agent: Optional[bool]
+    is_sterling_on_steroids: Optional[bool]
+    is_tablet_agent: Optional[bool]
     language: Optional[str] = ''
     locale: Optional[str] = ''
     origin: Optional[str] = ''
@@ -1357,8 +1357,8 @@ class ClientContext(BaseModel):
     sterling_on_steroids_user_type: None
     triggerable_experiments: TriggerableExperiments
     unauth_id: Optional[str] = ''
-    seo_debug: bool
-    user_agent_can_use_native_app: bool
+    seo_debug: Optional[bool]
+    user_agent_can_use_native_app: Optional[bool]
     user_agent_platform: Optional[str] = ''
     user_agent_platform_version: None
     user_agent: Optional[str] = ''

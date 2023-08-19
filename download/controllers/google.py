@@ -4,7 +4,7 @@ from typing import List
 
 from google_images_search import GoogleImagesSearch
 
-from download import settings
+from download.settings import DownloadSettings
 from core.ProcessedItem import ProcessedItem
 
 
@@ -12,7 +12,8 @@ logger = logging.getLogger()
 
 
 def get_items(limit: int = 50, query: str = "people") -> List[ProcessedItem]:
-    gis = GoogleImagesSearch(settings.google.api_key, settings.google.cx)
+    download_settings = DownloadSettings()
+    gis = GoogleImagesSearch(download_settings.google.api_key, download_settings.google.cx)
 
     _search_params = {
         'q': query,

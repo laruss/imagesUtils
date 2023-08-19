@@ -1,46 +1,30 @@
 import {Button} from "@mui/material";
-import {api} from "../../app/api";
-import useErrorHandler from "../../helpers/useErrorHandler";
-import {useEffect} from "react";
-import {showLoader, showNotification} from "../../helpers/dispatchers";
+import {MutationTrigger, UseMutation} from "@reduxjs/toolkit/dist/query/react/buildHooks";
+import {MutationDefinition} from "@reduxjs/toolkit/query";
+import useImageDataMutation from "./helpers/useImageDataMutation";
 
 export interface ActionButtonProps {
-    image: string;
     label: string;
-    apiMutation: typeof api.useUpdateImageDescriptionMutation
-        | typeof api.useUpdateByGPTMutation
-        | typeof api.useSetJSONFromGPTMutation
-        | typeof api.useConvertToWebPMutation
-        | typeof api.useOptimizeImageMutation
-        | typeof api.useDeleteImageMutation;
+    apiMutation: UseMutation<MutationDefinition<any, any, any, any, any>>;
     color?: "inherit" | "error" | "primary" | "secondary" | "success" | "info" | "warning" | undefined;
-    method?: () => void;
+    mutationCallBack?: () => void;
+    onClick: (mutationTrigger: MutationTrigger<any>) => void;
 }
 
-const ActionButton = ({image, label, apiMutation, color, method}: ActionButtonProps) => {
-    const [
-        mutationTrigger,
-        { error, data, isLoading }
-    ] = apiMutation();
+const ActionButton = ({label, apiMutation, color, mutationCallBack, onClick}: ActionButtonProps) => {
 
-    useErrorHandler({ error, message: `Error while ${label}` });
-
-    useEffect(() => {
-        if (data) {
-            showNotification(`${label} done`, 'success');
-            method && method();
-        }
-    }, [data]);
-
-    useEffect(() => showLoader(isLoading), [isLoading]);
-
-    const onClick = () => mutationTrigger({id: image});
+    const {mutationTrigger} = useImageDataMutation({
+        apiMutationMethod: apiMutation,
+        actionName: label,
+        callback: mutationCallBack
+    })
 
     return (
         <Button
             variant={'contained'}
-            onClick={onClick}
+            onClick={() => onClick(mutationTrigger)}
             color={color}
+            style={{zIndex: 5, flexShrink: 0}}
         >
             {label}
         </Button>

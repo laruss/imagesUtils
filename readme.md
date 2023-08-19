@@ -32,6 +32,11 @@ Web interface for all modules: [web_interface](./web_interface/readme.md) submod
 - [x] implement description module
 - [x] implement cloud module
 - [x] implement web interface
-- [ ] fix settings to use them in web interface
-- [ ] fix updating settings via web interface
+- [x] fix settings to use them in web interface
+- [x] fix updating settings via web interface
+- [x] fix http error to correspond to conventions
+- [ ] add response with info about processed method
+- [ ] fix core settings to transfer them from web server
+- [ ] validate data forms before sending to server (front)
+- [ ] consider how to communicate information to the client during long processing
 - [ ] add docker support

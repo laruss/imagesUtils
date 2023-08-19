@@ -1,12 +1,20 @@
-import core.settings
+from enum import Enum
+
+from pydantic import BaseModel
 
 
-class Settings(core.settings.Settings):
-    quality = 80
-    delete_original = True
+class Methods(str, Enum):
+    to_webp = 'to_webp'
+    minimize = 'minimize'
 
-    image_filter_size_kb = 1024
-    image_final_size_kb = 512
-    file_extension = '.webp'
 
-    silent = False
+class OptimizeSettings(BaseModel):
+    method: Methods = Methods.to_webp
+    quality: int = 80
+    delete_original: bool = True
+
+    image_filter_size_kb: int = 1024
+    image_final_size_kb: int = 512
+    file_extension: str = '.webp'
+
+    silent: bool = False

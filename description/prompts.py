@@ -7,8 +7,8 @@ WARNING: If you want to use formatting in the prompt, use item as instance of Pr
 """
 
 
-class Prompts(Enum):
-    insta_post = '''
+class Prompts(str, Enum):
+    default = '''
 The following photo was described as: \"{item.description}\". 
 Also it has the name of \"{item.title}\". 
 

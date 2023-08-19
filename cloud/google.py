@@ -10,7 +10,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
-from cloud import settings
+from cloud.settings import CloudSettings
 from core.utils import get_logger
 
 # If modifying these scopes, delete the file token.json.
@@ -19,7 +19,7 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 logger = get_logger()
 
 
-class MimeTypes(Enum):
+class MimeTypes(str, Enum):
     FOLDER = "application/vnd.google-apps.folder"
     IMAGE = "image/jpeg"
     ZIP = "application/zip"
@@ -51,7 +51,7 @@ class GoogleDriveClient:
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     'credentials.json', SCOPES)
-                creds = flow.run_local_server(port=settings.google.local_server_port)
+                creds = flow.run_local_server(port=CloudSettings.google.local_server_port)
             # Save the credentials for the next run
             with open('token.json', 'w') as token:
                 token.write(creds.to_json())
@@ -173,10 +173,14 @@ class GoogleDriveClient:
         folder = self.create_folder_if_not_exists(folder_name)
         file_name = file_path.split("/")[-1]
 
-        if delete_if_exists:
-            files = self.search_for_file_by_name(file_name, self.mimetypes.ZIP)
-            if len(files) > 0:
+        files = self.search_for_file_by_name(file_name, self.mimetypes.ZIP)
+
+        if len(files) > 0:
+            logger.info(f"File {file_name} already exists in {folder.name}")
+            if delete_if_exists:
                 self.delete_file(files[0])
+            else:
+                logger.warning(f"File {file_name} already exists in {folder.name}, skipping")
 
         return self.upload_to_folder(folder, file_path, self.mimetypes.ZIP, file_name)
 

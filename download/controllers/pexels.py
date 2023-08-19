@@ -3,7 +3,7 @@ import requests
 
 from typing import List
 
-from download import settings
+from download.settings import DownloadSettings
 from core.ProcessedItem import ProcessedItem
 from download.models.pexels.Result import Result
 
@@ -14,13 +14,13 @@ def _get_items(query: str = "people", limit: int = 50) -> Result:
     logger.info(f"Getting {limit} items from pexels")
 
     headers = {
-        "Authorization": settings.pexels.api_key,
+        "Authorization": DownloadSettings().pexels.api_key,
     }
     url = f"https://api.pexels.com/v1/search?query={query}&per_page={limit}"
     response = requests.get(url, headers=headers)
 
     if response.status_code != 200:
-        print(response.text)
+        logger.warning(response.text)
         raise Exception(f"Error {response.status_code} when fetching items")
 
     result = response.json()
