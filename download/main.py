@@ -2,6 +2,7 @@
 
 import argparse
 
+from core.settings import CoreSettings
 from core.utils import set_logger, get_logger
 
 from download import utils
@@ -33,7 +34,8 @@ def main():
             source=Sources[args.source],
             images_limit=args.limit,
             prompt=args.prompt
-        )
+        ),
+        core_settings=CoreSettings()
     )
 
 

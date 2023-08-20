@@ -30,19 +30,27 @@ export default function ImagesList() {
                 <Divider>Images</Divider>
                 <List component="nav" aria-label="main mailbox folders" style={{height: '76vh', overflow: 'auto'}}>
                     {
-                        images && images.map((image: string) => {
-                            return (
-                                <ListItem>
-                                    <ListItemButton
-                                        key={image}
-                                        selected={currentImage === image}
-                                        onClick={(event) => handleListItemClick(event, image)}
-                                    >
-                                        <ListItemText primary={image}/>
-                                    </ListItemButton>
-                                </ListItem>
+                        images && (
+                            images.length > 0 ? (
+                                images.map((image: string) => {
+                                    return (
+                                        <ListItem key={image}>
+                                            <ListItemButton
+                                                key={image}
+                                                selected={currentImage === image}
+                                                onClick={(event) => handleListItemClick(event, image)}
+                                            >
+                                                <ListItemText primary={image}/>
+                                            </ListItemButton>
+                                        </ListItem>
+                                    )
+                                })
+                            ) : (
+                                <Box>
+                                    <h1>No images</h1>
+                                </Box>
                             )
-                        })
+                        )
                     }
                 </List>
             </Paper>

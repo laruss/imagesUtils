@@ -19,6 +19,16 @@ export const api = createApi({
             }),
             invalidatesTags: ['settings'],
         }),
+        resetSettings: builder.mutation({
+            query: () => ({
+                url: '/settings',
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }),
+            invalidatesTags: ['settings'],
+        }),
         getSettingsSchema: builder.query({
             query: () => '/settings/schema',
             providesTags: ['settingsSchema'],

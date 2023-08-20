@@ -24,7 +24,7 @@ def get_image(image_id):
 def delete_image(image_id):
     controller.delete_image(image_id)
 
-    return success_response()
+    return success_response(message="Image was deleted")
 
 
 @images_bp.route('/<image_id>/data', methods=['GET'])
@@ -42,7 +42,8 @@ def get_image_data_schema():
 @images_bp.route('/<image_id>/data', methods=['POST'])
 @error_handler
 def set_image_data(image_id):
-    return success_response(controller.set_image_data(image_id, flask.request.json))
+    controller.set_image_data(image_id, flask.request.json)
+    return success_response(message="Image data was updated")
 
 
 @images_bp.route('/<image_id>/description', methods=['PUT'])
@@ -50,7 +51,7 @@ def set_image_data(image_id):
 def generate_image_description(image_id):
     controller.generate_image_description(image_id)
 
-    return success_response()
+    return success_response(message="Image description was generated")
 
 
 @images_bp.route('/<image_id>/gpt', methods=['PUT'])
@@ -58,7 +59,7 @@ def generate_image_description(image_id):
 def process_by_gpt(image_id):
     controller.process_by_gpt(image_id)
 
-    return success_response()
+    return success_response(message="Image was processed by GPT")
 
 
 @images_bp.route('/<image_id>/gpt/json', methods=['PUT'])
@@ -66,7 +67,7 @@ def process_by_gpt(image_id):
 def gpt2json(image_id):
     controller.gpt2json(image_id)
 
-    return success_response()
+    return success_response(message="GPT text was converted to JSON")
 
 
 @images_bp.route('/<image_id>/webp', methods=['PUT'])
@@ -74,7 +75,7 @@ def gpt2json(image_id):
 def to_webp(image_id):
     controller.to_webp(image_id)
 
-    return success_response()
+    return success_response(message="Image was converted to webp")
 
 
 @images_bp.route('/<image_id>/optimize', methods=['PUT'])
@@ -82,6 +83,4 @@ def to_webp(image_id):
 def optimize(image_id):
     controller.optimize_image(image_id)
 
-    return success_response()
-
-
+    return success_response(message="Image was optimized")

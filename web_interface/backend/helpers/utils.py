@@ -19,8 +19,8 @@ def not_found_response(data: dict = None) -> flask.Response:
     return _response(data, status=404)
 
 
-def success_response(data: Union[dict, list] = None) -> flask.Response:
-    data = data or {"success": True}
+def success_response(data: Union[dict, list] = None, message: str = None) -> flask.Response:
+    data = {"message": message} if message else (data or {"success": True})
 
     return _response(data)
 

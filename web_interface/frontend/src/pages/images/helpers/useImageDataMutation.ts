@@ -20,7 +20,7 @@ const useImageDataMutation = ({apiMutationMethod, actionName, callback}: ImageDa
 
     useEffect(() => {
         if (data) {
-            showNotification(`${actionName} is done`, 'success');
+            data && showNotification(data.message || `${actionName} is done`, 'success');
             callback && callback();
         }
     }, [data]);

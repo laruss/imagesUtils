@@ -1,6 +1,7 @@
 from typing import Union, Literal
 
 from core.utils import read_json_from_file, write_json_to_file
+from web_interface.backend.helpers.json_schema import JsonSchemaGenerator
 from web_interface.backend.settings import settings_file_path, settings_data_schema_file_path
 
 from download.settings import DownloadSettings as DownloadSettings
@@ -29,7 +30,7 @@ def _create_settings_schema() -> dict:
     schema = {}
 
     for model_name, model in models.items():
-        schema[model_name] = model.model_json_schema()
+        schema[model_name] = model.model_json_schema(schema_generator=JsonSchemaGenerator)
 
     write_json_to_file(schema, settings_data_schema_file_path, True, True)
 
@@ -73,3 +74,7 @@ def set_settings(new_data: dict) -> dict:
     write_json_to_file(new_data, settings_file_path, rewrite=True)
 
     return new_data
+
+
+def reset_settings() -> dict:
+    return set_settings(_create_settings_data())

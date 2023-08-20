@@ -8,10 +8,9 @@ from PIL import Image
 from transformers import BlipProcessor, BlipForConditionalGeneration
 
 from core.ProcessedItem import ProcessedItem
-from core.utils import read_json_from_file, write_json_to_file, get_logger
+from core.utils import get_logger
 from description.prompt_schema import GPTResponseJSON
 from description.settings import DescriptionSettings, Methods, DescriptionInitSettings, NSFWDetectionSettings
-from core.settings import CoreSettings
 
 logger = get_logger()
 
@@ -88,7 +87,16 @@ def describe(item: ProcessedItem, settings: DescriptionInitSettings = Descriptio
     return result
 
 
-def delete_nsfw(item: ProcessedItem, settings: NSFWDetectionSettings = NSFWDetectionSettings()) -> None:
+def delete_nsfw(
+        item: ProcessedItem,
+        settings: NSFWDetectionSettings = NSFWDetectionSettings()
+) -> bool:
+    """
+    Delete item if nsfw is True
+    :param item: ProcessedItem
+    :param settings: NSFWDetectionSettings
+    :return: bool, whether item was deleted
+    """
     logger.info(f"Checking {item.id} for nsfw")
 
     io_image = open(item.image, 'rb')
@@ -96,20 +104,10 @@ def delete_nsfw(item: ProcessedItem, settings: NSFWDetectionSettings = NSFWDetec
     if _is_nsfw(io_image, settings):
         logger.warning(f"Deleting {item.id}, nsfw is True")
         item.delete()
+        return True
     else:
         logger.info(f"Skipping {item.id}, nsfw is False")
-
-
-def save_item(item: ProcessedItem) -> None:
-    logger.info(f"Saving item: {item.id}")
-
-    core_settings = CoreSettings()
-
-    items_dict = read_json_from_file(core_settings.data_file, error_on_invalid_json=False) or {}
-
-    items_dict[str(item.id)] = item.model_dump()
-
-    write_json_to_file(items_dict, core_settings.data_file, rewrite=True)
+        return False
 
 
 def gpt2json(item: ProcessedItem) -> Optional[GPTResponseJSON]:
@@ -134,6 +132,8 @@ def flow(items: List[ProcessedItem], settings: DescriptionSettings = Description
     :param settings: Settings
     :return: None
     """
+    item_processed = []
+
     for item in items:
 
         mapping = {
@@ -144,4 +144,9 @@ def flow(items: List[ProcessedItem], settings: DescriptionSettings = Description
         }
 
         method, parameter = mapping[settings.method]
-        method(parameter)
+        _, result = method(parameter)
+
+        if result:
+            item_processed.append(item)
+
+    return item_processed

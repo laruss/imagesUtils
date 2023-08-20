@@ -95,6 +95,11 @@ def gpt(
 
     resp_text = mapper[service](prompt_text, settings)
 
+    if resp_text == "":
+        logger.warning(f"Got empty response from {service} for {item.id}, skipping")
+
+        return None
+
     logger.info(f"Processed {item.id} by {service}, response is {resp_text}")
 
     return resp_text

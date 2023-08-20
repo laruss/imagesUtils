@@ -14,30 +14,30 @@ blueprints = [settings_bp, images_bp]
 
 @api_bp.route('/download', methods=['POST'])
 def download_images():
-    controller.download_images()
+    message = controller.download_images()
 
-    return success_response()
+    return success_response(message=message)
 
 
 @api_bp.route('/optimize', methods=['POST'])
 def optimize_images():
-    controller.optimize_images()
+    message = controller.optimize_images()
 
-    return success_response()
+    return success_response(message=message)
 
 
 @api_bp.route('/description', methods=['POST'])
 def describe_images():
-    controller.describe_images()
+    message = controller.describe_images()
 
-    return success_response()
+    return success_response(message=message)
 
 
 @api_bp.route('/cloud', methods=['POST'])
 def cloud_images():
-    controller.cloud_images()
+    message = controller.cloud_images()
 
-    return success_response()
+    return success_response(message=message)
 
 
 @api_bp.route('/', methods=['GET'])

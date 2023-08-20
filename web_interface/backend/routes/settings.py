@@ -19,4 +19,11 @@ def get_settings_schema():
 
 @settings_bp.route('/', methods=['POST'])
 def set_settings():
-    return success_response(controller.set_settings(flask.request.json))
+    controller.set_settings(flask.request.json)
+    return success_response(message="Settings updated successfully")
+
+
+@settings_bp.route('/', methods=['DELETE'])
+def reset_settings():
+    controller.reset_settings()
+    return success_response(message="Settings reset successfully")

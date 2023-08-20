@@ -1,4 +1,4 @@
-import {Box, Paper} from "@mui/material";
+import {Box} from "@mui/material";
 import ActionButton, {ActionButtonProps} from "./ActionButton";
 import {api} from "../../app/api";
 import {MutationTrigger} from "@reduxjs/toolkit/dist/query/react/buildHooks";

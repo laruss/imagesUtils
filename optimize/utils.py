@@ -27,7 +27,14 @@ def _get_file_size_in_kb(filepath):
     return os.path.getsize(filepath) / 1024
 
 
-def minimize_one(image_path: str, settings: OptimizeSettings = OptimizeSettings()) -> None:
+def minimize_one(image_path: str, settings: OptimizeSettings = OptimizeSettings()) -> bool:
+    """
+    Minimize image size
+
+    :param image_path:
+    :param settings:
+    :return: bool whether image was minimized
+    """
     start_image_quality = 90
 
     if not os.path.exists(image_path):
@@ -39,14 +46,27 @@ def minimize_one(image_path: str, settings: OptimizeSettings = OptimizeSettings(
             while _get_file_size_in_kb(image_path) > settings.image_final_size_kb and quality > 10:
                 im.save(image_path, "WEBP", quality=quality)
                 quality -= 5  # Reduce quality by 5% per iteration
-            logger.info(f"Image {image_path} was optimized, new size: {_get_file_size_in_kb(image_path)} KB")
+        logger.info(f"Image {image_path} was optimized, new size: {_get_file_size_in_kb(image_path)} KB")
+
+        return True
+    else:
+        logger.info(f"Image {image_path} was not optimized, size: {_get_file_size_in_kb(image_path)} KB")
+
+        return False
 
 
-def flow(items: List[ProcessedItem], settings: OptimizeSettings = OptimizeSettings()):
+def flow(items: List[ProcessedItem], settings: OptimizeSettings = OptimizeSettings()) -> List[ProcessedItem]:
+    processed_items = []
+
     for item in items:
         if settings.method == Methods.to_webp:
-            item.to_webp(settings)
+            image_path, result = item.to_webp(settings)
         elif settings.method == Methods.minimize:
-            item.optimize(settings)
+            image_path, result = item.optimize(settings)
         else:
             raise Exception("Unknown method")
+
+        if result:
+            processed_items.append(item)
+
+    return processed_items

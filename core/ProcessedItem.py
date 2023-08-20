@@ -1,5 +1,6 @@
+import json
 import logging
-from typing import Optional, Union
+from typing import Optional, Union, Tuple
 
 from pydantic import BaseModel
 
@@ -22,39 +23,56 @@ class ProcessedItem(BaseModel):
 
         return get_image_path_by_id(self.id)
 
-    def describe(self, settings: DescriptionInitSettings = DescriptionInitSettings()) -> str:
+    def describe(self, settings: DescriptionInitSettings = DescriptionInitSettings()) -> Tuple[str, bool]:
+        """
+        Describe image
+        :param settings:
+        :return: description, bool whether description was generated
+        """
         from description.utils import describe
 
         if not self.description:
             self.description = describe(self, settings)
             self.save()
+            return self.description, True
 
-        return self.description
+        return self.description, False
 
-    def process_by_gpt(self, settings: GPTSettings = GPTSettings()) -> str:
+    def process_by_gpt(self, settings: GPTSettings = GPTSettings()) -> Tuple[Optional[str], bool]:
         from description.gpt import gpt
 
         if not self.gptText or not settings.skip_gpt_if_gpted:
             self.gptText = gpt(self, settings)
             self.save()
 
-        return self.gptText
+            if self.gptText:
+                return self.gptText, True
 
-    def gpt2json(self, settings: GPTSettings = GPTSettings()) -> Optional[dict]:
+        return self.gptText, False
+
+    def gpt2json(self, settings: GPTSettings = GPTSettings()) -> Tuple[Optional[str], bool]:
         from description.utils import gpt2json
 
         if not settings.use_prompt_schema:
             logging.warning("Prompt schema is disabled, gpt2json will return None")
 
-            return None
+            return None, False
 
         if not self.gptJSON:
             self.gptJSON = gpt2json(self)
             self.save()
 
-        return self.gptJSON.model_dump() if self.gptJSON else None
+            if self.gptJSON:
+                return json.dumps(self.gptJSON.model_dump()), True
 
-    def to_webp(self, settings: OptimizeSettings = OptimizeSettings()) -> str:
+        return json.dumps(self.gptJSON.model_dump()), False
+
+    def to_webp(self, settings: OptimizeSettings = OptimizeSettings()) -> Tuple[str, bool]:
+        """
+        Convert image to webp format
+        :param settings:
+        :return: image path, bool whether image was converted
+        """
         from optimize.utils import one_to_webp
 
         image = self.image
@@ -62,22 +80,20 @@ class ProcessedItem(BaseModel):
             raise Exception(f"File {image} does not exist.")
 
         if image.endswith('.webp'):
-            return image
+            return image, False
 
         one_to_webp(image, settings)
 
-        return self.image
+        return self.image, True
 
-    def optimize(self, settings: OptimizeSettings = OptimizeSettings()) -> str:
+    def optimize(self, settings: OptimizeSettings = OptimizeSettings()) -> Tuple[str, bool]:
         from optimize.utils import minimize_one
 
         image = self.image
         if not image:
             raise Exception(f"File {image} does not exist.")
 
-        minimize_one(image, settings)
-
-        return self.image
+        return self.image, minimize_one(image, settings)
 
     def save(self) -> None:
         from core.utils import read_json_from_file, write_json_to_file, get_logger
@@ -100,10 +116,10 @@ class ProcessedItem(BaseModel):
 
         delete_image_data(self.id)
 
-    def delete_if_nsfw(self, settings: NSFWDetectionSettings = NSFWDetectionSettings()) -> None:
+    def delete_if_nsfw(self, settings: NSFWDetectionSettings = NSFWDetectionSettings()) -> Tuple[str, bool]:
         from description.utils import delete_nsfw
 
-        delete_nsfw(self, settings)
+        return '', delete_nsfw(self, settings)
 
     def save_image(self) -> None:
         from download.utils import download_image

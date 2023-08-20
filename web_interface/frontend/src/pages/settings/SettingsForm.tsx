@@ -8,6 +8,8 @@ import {api} from "../../app/api";
 import useErrorHandler from "../../helpers/useErrorHandler";
 import {useEffect} from "react";
 import {showLoader, showNotification} from "../../helpers/dispatchers";
+import useUpdateSettings from "./helpers/useUpdateSettings";
+import useResetSettings from "./helpers/useResetSettings";
 
 interface FormProps {
     fields: {
@@ -24,26 +26,17 @@ const SettingsForm = ({fields, fieldsSchema}: FormProps) => {
     const dispatch = useAppDispatch();
     const fieldsAreChanged = useAppSelector(selectSettingsFieldsAreChanged);
 
+    const { updateSettings } = useUpdateSettings();
+    const { resetSettings } = useResetSettings();
+
     const onChange = (e: IChangeEvent<any>, key: string) => {
         const newFields = {...fields};
         newFields[key] = e.formData;
         dispatch(changeFields(newFields));
     };
 
-    const [
-        updateSettings,
-        { error, data, isLoading }
-    ] = api.useUpdateSettingsMutation();
-
     const onSubmit = () => { updateSettings({fields}); };
-
-    useErrorHandler({ error, message: `Error while updating settings` });
-
-    useEffect(() => {
-        if (data) showNotification(`Settings updated`, 'success');
-    }, [data]);
-
-    useEffect(() => showLoader(isLoading), [isLoading]);
+    const onReset = () => { resetSettings({}); };
 
     return (
         <Box style={{display: 'flex', gap: '2em'}}>
@@ -66,14 +59,23 @@ const SettingsForm = ({fields, fieldsSchema}: FormProps) => {
                     )
                 })
             }
-            <Button
-                variant={'contained'}
-                style={{position: "absolute", top: '1ch', right: '1ch'}}
-                disabled={!fieldsAreChanged}
-                onClick={onSubmit}
+            <Box
+                style={{position: "absolute", top: '1ch', right: '1ch', display: 'flex', gap: '0.5em'}}
             >
-                Save
-            </Button>
+                <Button
+                    variant={'contained'}
+                    onClick={onReset}
+                >
+                    Reset
+                </Button>
+                <Button
+                    variant={'contained'}
+                    disabled={!fieldsAreChanged}
+                    onClick={onSubmit}
+                >
+                    Save
+                </Button>
+            </Box>
         </Box>
     );
 };

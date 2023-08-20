@@ -9,10 +9,12 @@ interface ErrorInterface {
 }
 
 const useErrorHandler = ({error, message}: ErrorInterface) => {
+    const errMsg = (error && ('error' in error ? error.error : JSON.stringify((error as FetchBaseQueryError).data))) || message;
+
     useEffect(() => {
         if (error) {
             console.warn(error);
-            showNotification(message, 'error');
+            showNotification(errMsg, 'error');
         }
     }, [error, message]);
 };

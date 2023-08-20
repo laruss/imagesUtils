@@ -2,7 +2,7 @@ import os
 from enum import Enum
 
 from decouple import Config, RepositoryEnv
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel, SecretStr, Field
 
 from description.prompts import Prompts
 
@@ -11,8 +11,8 @@ env_config = Config(RepositoryEnv(dot_env_path))
 
 
 class Sightengine(BaseModel):
-    api_user: str = env_config.get('SIGHTENGINE_API_USER')
-    api_secret: SecretStr = env_config.get('SIGHTENGINE_API_SECRET')
+    api_user: int = Field(int(env_config.get('SIGHTENGINE_API_USER')), min=0)
+    api_secret: SecretStr = Field(env_config.get('SIGHTENGINE_API_SECRET'), min_length=20, max_length=20)
     models: str = 'nudity-2.0'
 
 

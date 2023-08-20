@@ -1,3 +1,4 @@
+import logging
 import os
 
 import flask
@@ -38,11 +39,12 @@ def send_js(path):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return flask.jsonify({'error': 'Page not found'}), 404
+    return flask.jsonify({'error': 'route not found'}), 404
 
 
-@app.errorhandler(500)
+@app.errorhandler(Exception)
 def internal_server_error(e):
+    logging.warning(f"Internal server error: {type(e)} {e}")
     return flask.jsonify({'error': str(e)}), 500
 
 
