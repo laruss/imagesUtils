@@ -17,18 +17,20 @@ def download_images() -> str:
     return f"Downloaded {len(items_processed)} items"
 
 
-def optimize_images():
+def optimize_images(method: OptimizeMethods = OptimizeMethods.to_webp) -> str:
     items = get_images_models()
     settings: OptimizeSettings = get_settings_as_model('optimize')
+    settings.method = method
     items_processed = optimize_flow(items, settings)
     method = "webp-ed" if settings.method == OptimizeMethods.to_webp else "compressed"
 
     return f"{method.capitalize()} {len(items_processed)} items"
 
 
-def describe_images():
+def describe_images(method: DescriptionMethods = DescriptionMethods.describe) -> str:
     items = get_images_models()
     settings = get_settings_as_model('description')
+    settings.method = method
     items_processed = description_flow(items, settings)
 
     mappings = {
@@ -41,9 +43,10 @@ def describe_images():
     return f"{mappings[settings.method].capitalize()} {len(items_processed)} items"
 
 
-def cloud_images():
+def cloud_images(method: CloudMethods = CloudMethods.upload) -> str:
     settings: CloudSettings = get_settings_as_model('cloud')
     core_settings = get_settings_as_model('core')
+    settings.method = method
 
     items = []
 

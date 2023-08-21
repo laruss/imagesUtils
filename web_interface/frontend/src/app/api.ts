@@ -106,23 +106,57 @@ export const api = createApi({
             }),
             invalidatesTags: ['images'],
         }),
-        generateDescriptions: builder.mutation({
+        describeImagesDescribe: builder.mutation({
             query: () => ({
-                url: `/description`,
+                url: `/description/describe`,
                 method: 'POST',
             }),
-            invalidatesTags: ['images', 'imageData'],
+            invalidatesTags: ['imageData'],
         }),
-        optimizeImages: builder.mutation({
+        describeImagesDeleteNSFW: builder.mutation({
             query: () => ({
-                url: `/optimize`,
+                url: `/description/delete/nsfw`,
                 method: 'POST',
             }),
             invalidatesTags: ['images'],
         }),
-        useCloud: builder.mutation({
+        describeImagesGpt: builder.mutation({
             query: () => ({
-                url: `/cloud`,
+                url: `/description/gpt`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['imageData'],
+        }),
+        describeImagesGptJson: builder.mutation({
+            query: () => ({
+                url: `/description/gpt2json`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['imageData'],
+        }),
+        optimizeImagesWebP: builder.mutation({
+            query: () => ({
+                url: `/optimize/webp`,
+                method: 'POST',
+            }),
+        }),
+        optimizeImagesMinimize: builder.mutation({
+            query: () => ({
+                url: `/optimize/minimize`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['images'],
+        }),
+        cloudUpload: builder.mutation({
+            query: () => ({
+                url: `/cloud/upload`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['images'],
+        }),
+        cloudDownload: builder.mutation({
+            query: () => ({
+                url: `/cloud/download`,
                 method: 'POST',
             }),
             invalidatesTags: ['images'],

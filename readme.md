@@ -37,7 +37,8 @@ Web interface for all modules: [web_interface](./web_interface/readme.md) submod
 - [x] fix http error to correspond to conventions
 - [x] add response with info about processed method
 - [x] fix core settings to transfer them from web server
-- [ ] add methods dropdowns to web interface (front)
+- [x] add methods dropdowns to web interface (front)
+- [ ] method for searching for duplicates and similar images
 - [ ] validate data forms before sending to server (front)
 - [ ] use Celery for long tasks (all images methods)
 - [ ] add docker support

@@ -2,11 +2,12 @@ import {Box} from "@mui/material";
 import ActionButton, {ActionButtonProps} from "./ActionButton";
 import {api} from "../../app/api";
 import {MutationTrigger} from "@reduxjs/toolkit/dist/query/react/buildHooks";
+import ActionsDropdown, {ActionsDropdownProps} from "./ActionsDropdown";
 
 const ImagesActions = () => {
     const onClick = (mutationTrigger: MutationTrigger<any>) => mutationTrigger({});
 
-    const buttons: ActionButtonProps[] = [
+    const actions: (ActionButtonProps | ActionsDropdownProps)[] = [
         {
             onClick,
             label: 'download images',
@@ -14,22 +15,67 @@ const ImagesActions = () => {
             color: 'primary'
         },
         {
-            onClick,
-            label: 'generate descriptions',
-            apiMutation: api.useGenerateDescriptionsMutation,
-            color: 'info'
+            label: 'descriptions',
+            buttons: [
+                {
+                    onClick,
+                    label: 'generate',
+                    apiMutation: api.useDescribeImagesDescribeMutation,
+                    color: 'info'
+                },
+                {
+                    onClick,
+                    label: 'delete nsfw',
+                    apiMutation: api.useDescribeImagesDeleteNSFWMutation,
+                    color: 'error'
+                },
+                {
+                    onClick,
+                    label: 'process by gpt',
+                    apiMutation: api.useDescribeImagesGptMutation,
+                    color: 'info'
+                },
+                {
+                    onClick,
+                    label: 'gpt to json',
+                    apiMutation: api.useDescribeImagesGptJsonMutation,
+                    color: 'info'
+                }
+            ]
         },
         {
-            onClick,
-            label: 'optimize images',
-            apiMutation: api.useOptimizeImagesMutation,
-            color: 'primary'
+            label: 'optimization',
+            buttons: [
+                {
+                    onClick,
+                    label: 'convert to webp',
+                    apiMutation: api.useOptimizeImagesWebPMutation,
+                    color: 'info'
+                },
+                {
+                    onClick,
+                    label: 'minimize',
+                    apiMutation: api.useOptimizeImagesMinimizeMutation,
+                    color: 'info'
+                }
+            ]
         },
         {
-            onClick,
-            label: 'use cloud',
-            apiMutation: api.useUseCloudMutation,
-            color: 'info'
+            label: 'cloud',
+            buttons: [
+                {
+                    onClick,
+                    label: 'upload all',
+                    apiMutation: api.useCloudUploadMutation,
+                    color: 'info'
+                },
+                {
+                    onClick,
+                    label: 'download all',
+                    apiMutation: api.useCloudDownloadMutation,
+                    color: 'info'
+                }
+            ]
         }
     ];
 
@@ -40,8 +86,10 @@ const ImagesActions = () => {
             top: '1ch', display: 'inline-flex', justifyContent: 'center',
         }}>
             {
-                buttons.map((button, index) => (
-                    <ActionButton key={index} {...button}/>
+                actions.map((action, index) => (
+                    action.label === actions[0].label ?
+                        <ActionButton key={index} {...(action as ActionButtonProps)}/> :
+                        <ActionsDropdown key={index} {...(action as ActionsDropdownProps)}/>
                 ))
             }
         </Box>
