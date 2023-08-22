@@ -2,6 +2,11 @@
 
 This submodule contains the scripts to describe the images from the `./static/images` folder.
 
+- [x] describe images (replicate.com API or transformers)
+- [x] delete images with NSFW content
+- [x] process images with GPT (openai.com API or g4f library)
+- [x] convert GPT description to json format by the model template
+
 ## Installation
 
 ```bash

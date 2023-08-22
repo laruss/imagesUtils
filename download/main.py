@@ -7,6 +7,7 @@ from core.utils import set_logger, get_logger
 
 from download import utils
 from download.settings import DownloadSettings, Sources
+from download.utils import DownloadUtils
 
 parser = argparse.ArgumentParser()
 logger = get_logger()
@@ -29,14 +30,14 @@ def main():
 
     logger.info(f"Downloading images from `{args.source}` source, limit: {args.limit}, prompt: {args.prompt}")
 
-    utils.flow(
+    DownloadUtils(
         settings=DownloadSettings(
             source=Sources[args.source],
             images_limit=args.limit,
             prompt=args.prompt
         ),
         core_settings=CoreSettings()
-    )
+    ).flow()
 
 
 if __name__ == "__main__":

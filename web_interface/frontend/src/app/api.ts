@@ -147,6 +147,13 @@ export const api = createApi({
             }),
             invalidatesTags: ['images'],
         }),
+        optimizeImagesDuplicates: builder.mutation({
+            query: () => ({
+                url: `/optimize/duplicates`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['images'],
+        }),
         cloudUpload: builder.mutation({
             query: () => ({
                 url: `/cloud/upload`,

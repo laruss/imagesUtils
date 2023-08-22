@@ -16,6 +16,7 @@ def list_images():
 @images_bp.route('/<image_id>', methods=['GET'])
 @error_handler
 def get_image(image_id):
+    print(image_id)
     return controller.get_image(image_id)
 
 

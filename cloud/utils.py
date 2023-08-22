@@ -2,80 +2,82 @@ import os
 import shutil
 
 from cloud import yandex, google
-from cloud.settings import Providers, CloudSettings, Methods
+from cloud.settings import Providers, CloudSettings
 from core.settings import CoreSettings
 from core.utils import get_logger, create_folder_if_not_exists, delete_file
 
 logger = get_logger()
-full_zip_path = f"{CoreSettings().temp_folder}/{CloudSettings().zip_name}"
 
 
-def zip_by_path(path: str, zippath: str, delete_after_zip: bool = False) -> str:
-    if zippath.endswith(".zip"):
-        zippath = zippath.replace(".zip", "")
+class CloudUtils:
+    def __init__(self, settings: CloudSettings = CloudSettings(), core_settings: CoreSettings = CoreSettings()):
+        self.settings = settings
+        self.core_settings = core_settings
+        self.full_zip_path = f"{core_settings.temp_folder}/{settings.zip_name}"
 
-    zip_name = zippath.split("/")[-1]
-    path_to_zip = zippath.replace(zip_name, "")
+    def zip_by_path(self, path: str, delete_after_zip: bool = False) -> str:
+        zippath = self.full_zip_path
 
-    logger.info(f"Zipping {path} to {zippath}")
+        if zippath.endswith(".zip"):
+            zippath = zippath.replace(".zip", "")
 
-    create_folder_if_not_exists(path_to_zip)
-    shutil.make_archive(zippath, 'zip', path)
-    logger.info(f"Successfully zipped {path} to {zippath}")
+        zip_name = zippath.split("/")[-1]
+        path_to_zip = zippath.replace(zip_name, "")
 
-    if delete_after_zip:
-        shutil.rmtree(path)
-        logger.info(f"Deleted {path}")
+        logger.info(f"Zipping {path} to {zippath}")
 
-    return zippath
+        create_folder_if_not_exists(path_to_zip)
+        shutil.make_archive(zippath, 'zip', path)
+        logger.info(f"Successfully zipped {path} to {zippath}")
 
+        if delete_after_zip:
+            shutil.rmtree(path)
+            logger.info(f"Deleted {path}")
 
-def unzip_by_path(zippath: str, path: str, delete_after_unzip: bool = False) -> str:
-    logger.info(f"Unzipping {zippath} to {path}")
+        return zippath
 
-    shutil.unpack_archive(zippath, path)
-    logger.info(f"Successfully unzipped {zippath} to {path}")
+    def unzip_by_path(self, path: str, delete_after_unzip: bool = False) -> str:
+        zippath = self.full_zip_path
 
-    if delete_after_unzip:
-        os.remove(zippath)
-        logger.info(f"Deleted {zippath}")
+        logger.info(f"Unzipping {zippath} to {path}")
 
-    return path
+        shutil.unpack_archive(zippath, path)
+        logger.info(f"Successfully unzipped {zippath} to {path}")
 
+        if delete_after_unzip:
+            os.remove(zippath)
+            logger.info(f"Deleted {zippath}")
 
-def upload(settings: CloudSettings = CloudSettings(), core_settings: CoreSettings = CoreSettings()):
-    zip_by_path(core_settings.final_folder, full_zip_path, settings.delete_after_zip)
+        return path
 
-    properties = (settings.remote_folder_name, full_zip_path, settings.delete_remote_zip_before_upload)
+    def upload(self):
+        self.zip_by_path(self.core_settings.final_folder, self.settings.delete_after_zip)
 
-    if settings.provider == Providers.yandex:
-        yandex.upload_zip_to_folder_name(*properties)
-    elif settings.provider == Providers.google:
-        client = google.GoogleDriveClient()
-        client.upload_zip_to_folder_name(*properties)
-    else:
-        raise Exception(f"Unknown provider: {settings.provider.name}")
+        properties = (self.settings.remote_folder_name, self.full_zip_path, self.settings.delete_remote_zip_before_upload)
 
+        if self.settings.provider == Providers.yandex:
+            yandex.upload_zip_to_folder_name(*properties)
+        elif self.settings.provider == Providers.google:
+            client = google.GoogleDriveClient()
+            client.upload_zip_to_folder_name(*properties)
+        else:
+            raise Exception(f"Unknown provider: {self.settings.provider.name}")
 
-def download(settings: CloudSettings = CloudSettings(), core_settings: CoreSettings = CoreSettings()):
-    properties = (settings.remote_folder_name, full_zip_path)
+    def download(self):
+        properties = (self.settings.remote_folder_name, self.full_zip_path)
 
-    if settings.provider == Providers.yandex:
-        yandex.download_zip_from_folder_name(*properties)
-    elif settings.provider == Providers.google:
-        client = google.GoogleDriveClient()
-        client.download_zip_from_folder_name(*properties)
+        if self.settings.provider == Providers.yandex:
+            yandex.download_zip_from_folder_name(*properties)
+        elif self.settings.provider == Providers.google:
+            client = google.GoogleDriveClient()
+            client.download_zip_from_folder_name(*properties)
 
-    unzip_by_path(full_zip_path, core_settings.final_folder, settings.delete_after_zip)
+        self.unzip_by_path(self.core_settings.final_folder, self.settings.delete_after_zip)
 
+    def flow(self):
+        logger.info(f"Using `{self.settings.provider.name}` provider. Method: `{self.settings.method.name}`")
 
-def flow(settings: CloudSettings = CloudSettings(), core_settings: CoreSettings = CoreSettings()):
-    logger.info(f"Using `{settings.provider.name}` provider. Method: `{settings.method.name}`")
+        method = self.__getattribute__(f"{self.settings.method.name}")
 
-    methods_map = {
-        Methods.upload: upload,
-        Methods.download: download,
-    }
-
-    methods_map[Methods[settings.method.name]](settings, core_settings)
-    delete_file(full_zip_path)
+        method()
+        delete_file(self.full_zip_path)

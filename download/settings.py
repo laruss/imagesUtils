@@ -36,3 +36,5 @@ class DownloadSettings(BaseModel):
     pexels: Pexels = Pexels()
     scroller: Scroller = Scroller()
     google: Google = Google()
+
+    check_duplicates: bool = True

@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class Methods(str, Enum):
     to_webp = 'to_webp'
     minimize = 'minimize'
+    delete_duplicates = 'delete_duplicates'
 
 
 class OptimizeSettings(BaseModel):

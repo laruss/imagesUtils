@@ -5,7 +5,7 @@ from core.settings import CoreSettings
 from core.utils import set_logger, read_json_from_file, get_logger
 
 from description.settings import DescriptionSettings, Methods, GPTModel, Service, GPTSettings
-from description.utils import flow
+from description.utils import DescriptionUtils
 
 parser = argparse.ArgumentParser()
 logger = get_logger()
@@ -33,8 +33,7 @@ def main():
 
     logger.info(f"Processing {len(items)} items, using `{method.name}` method.")
 
-    flow(
-        items=[ProcessedItem(**val) for key, val in items.items()],
+    DescriptionUtils(
         settings=DescriptionSettings(
             method=method,
             gpt_settings=GPTSettings(
@@ -42,7 +41,7 @@ def main():
                 service=Service[args.used_gpt]
             )
         )
-    )
+    ).flow(items=[ProcessedItem(**val) for key, val in items.items()])
 
 
 if __name__ == "__main__":

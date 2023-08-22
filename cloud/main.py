@@ -1,6 +1,6 @@
 import argparse
 
-from cloud.utils import flow
+from cloud.utils import CloudUtils
 from core.settings import CoreSettings
 from core.utils import get_logger, set_logger
 from cloud.settings import CloudSettings, Providers, Methods
@@ -23,13 +23,13 @@ def main():
 
     set_logger(not args.silent)
 
-    flow(
+    CloudUtils(
         CloudSettings(
             method=Methods[args.method],
             provider=Providers[args.provider]
         ),
         CoreSettings()
-    )
+    ).flow()
 
 
 if __name__ == '__main__':

@@ -14,10 +14,16 @@ class Sightengine(BaseModel):
     api_user: int = Field(int(env_config.get('SIGHTENGINE_API_USER')), min=0)
     api_secret: SecretStr = Field(env_config.get('SIGHTENGINE_API_SECRET'), min_length=20, max_length=20)
     models: str = 'nudity-2.0'
+    url: str = "https://api.sightengine.com/1.0/check.json"
 
 
 class Replicate(BaseModel):
     api_token: SecretStr = env_config.get('REPLICATE_API_TOKEN')
+    api_model_version: str = 'methexis-inc/img2prompt:50adaf2d3ad20a6f911a8a9e3ccf777b263b8596fbd2c8fc26e8888f8a0edbb5'
+
+
+class Transformers(BaseModel):
+    api_model_name: str = "Salesforce/blip-image-captioning-base"
 
 
 class Openai(BaseModel):
@@ -53,6 +59,7 @@ class NSFWDetectionSettings(BaseModel):
 
 class DescriptionInitSettings(BaseModel):
     replicate: Replicate = Replicate()
+    transformers: Transformers = Transformers()
 
     engine: ImageToTextEngine = ImageToTextEngine.transformers
     skip_description_if_described: bool = True

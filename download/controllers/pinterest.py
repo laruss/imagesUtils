@@ -21,7 +21,7 @@ def _get_data(query: str = None, options: Options = None) -> Dict[Literal["optio
     )
 
     return {
-        "options": options.model_dump(),
+        "options": options.model_dump(mode="json"),
         "context": {}
     }
 

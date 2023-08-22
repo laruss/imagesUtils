@@ -2,6 +2,11 @@
 
 This submodule contains the scripts to download the images from some resources such as google, pexels, etc.
 
+- [x] download images from google
+- [x] download images from pexels
+- [x] download images from pinterest
+- [x] download images from scrolller
+
 ## Installation
 
 ```bash

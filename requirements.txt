@@ -17,3 +17,4 @@ flask~=2.3.2
 genson~=1.2.2
 jsonschema~=4.17.3
 flask-cors~=4.0.0
+imagehash~=4.3.1

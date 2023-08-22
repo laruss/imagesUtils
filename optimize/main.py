@@ -3,7 +3,7 @@ import argparse
 from core.ProcessedItem import ProcessedItem
 from core.settings import CoreSettings
 from core.utils import set_logger, read_json_from_file
-from optimize import utils
+from optimize.utils import OptimizeUtils
 from optimize.settings import OptimizeSettings, Methods
 
 parser = argparse.ArgumentParser()
@@ -18,18 +18,18 @@ def add_arguments():
 def main():
     add_arguments()
     args = parser.parse_args()
-    silent = args.silent or OptimizeSettings().silent
+
+    core_settings = CoreSettings()
+    optimize_settings = OptimizeSettings(method=Methods[args.method])
+
+    silent = args.silent or optimize_settings.silent
 
     set_logger(not silent)
 
-    items = read_json_from_file(CoreSettings().data_file, False) or {}
+    items = read_json_from_file(core_settings.data_file, False) or {}
 
-    utils.flow(
-        items=[ProcessedItem(**val) for key, val in items.items()],
-        settings=OptimizeSettings(
-            method=Methods[args.method]
-        )
-    )
+    OptimizeUtils(optimize_settings, core_settings) \
+        .flow(items=[ProcessedItem(**val) for key, val in items.items()])
 
 
 if __name__ == "__main__":

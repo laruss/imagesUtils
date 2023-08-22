@@ -4,21 +4,16 @@ import validator from "@rjsf/validator-ajv8";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {changeFields, selectSettingsFieldsAreChanged} from "../../app/slices/settingsSlice";
 import {IChangeEvent} from "@rjsf/core";
-import {api} from "../../app/api";
-import useErrorHandler from "../../helpers/useErrorHandler";
-import {useEffect} from "react";
-import {showLoader, showNotification} from "../../helpers/dispatchers";
 import useUpdateSettings from "./helpers/useUpdateSettings";
 import useResetSettings from "./helpers/useResetSettings";
+import SettingsFormGroup, { formGroupClassNames } from "./SettingsFormGroup";
 
 interface FormProps {
     fields: {
         [key: string]: any
     };
     fieldsSchema: {
-        [key: string]: {
-            [key: string]: any;
-        }
+        [key: string]: any
     };
 }
 
@@ -29,36 +24,39 @@ const SettingsForm = ({fields, fieldsSchema}: FormProps) => {
     const { updateSettings } = useUpdateSettings();
     const { resetSettings } = useResetSettings();
 
-    const onChange = (e: IChangeEvent<any>, key: string) => {
-        const newFields = {...fields};
-        newFields[key] = e.formData;
-        dispatch(changeFields(newFields));
+    const onChange = (e: IChangeEvent<any>) => {
+        dispatch(changeFields(e.formData));
     };
 
     const onSubmit = () => { updateSettings({fields}); };
-    const onReset = () => { resetSettings({}); };
+    const onReset = () => { resetSettings({}) };
+
+    const uiSchema = Object.keys(fieldsSchema.properties).reduce((acc: any, key: string) => {
+        acc[key] = { "ui:classNames": formGroupClassNames };
+        return acc;
+    }, {});
+    uiSchema.description.gpt_settings = {prompt: {
+            "ui:widget": "textarea",
+            "ui:options": { "rows": 10 }
+        }
+    };
 
     return (
         <Box style={{display: 'flex', gap: '2em'}}>
-            {
-                Object.keys(fieldsSchema).map((key, index) => {
-                    return (
-                        <Box
-                            key={index}
-                            style={{flex: 1, height: '87vh', overflow: 'auto'}}
-                        >
-                            <Form
-                                schema={fieldsSchema[key]}
-                                validator={validator}
-                                formData={fields[key]}
-                                onChange={(e) => onChange(e, key)}
-                            >
-                                <Button disabled/>
-                            </Form>
-                        </Box>
-                    )
-                })
-            }
+            <Box
+                style={{flex: 1, height: '87vh', overflow: 'auto'}}
+            >
+                <Form
+                    schema={fieldsSchema}
+                    uiSchema={uiSchema}
+                    validator={validator}
+                    formData={fields}
+                    onChange={onChange}
+                    templates={{ FieldTemplate: SettingsFormGroup }}
+                >
+                    <Button disabled/>
+                </Form>
+            </Box>
             <Box
                 style={{position: "absolute", top: '1ch', right: '1ch', display: 'flex', gap: '0.5em'}}
             >

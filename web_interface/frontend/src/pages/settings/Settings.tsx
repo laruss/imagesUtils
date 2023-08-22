@@ -33,7 +33,6 @@ const Settings = () => {
 
     return (
         <SettingsForm fields={settingsFields} fieldsSchema={settingsFieldsSchema}/>
-        // <Form schema={settingsFieldsSchema['cloud']} validator={validator} formData={settingsFields['cloud']}/>
     );
 };
 

@@ -2,6 +2,10 @@
 
 This submodule contains the scripts to optimize the images size and quality.
 
+- [x] optimize images size
+- [x] convert images to webp format
+- [x] search for duplicates and similar images
+
 ## Installation
 
 ```bash

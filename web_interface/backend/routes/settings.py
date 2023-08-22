@@ -1,3 +1,5 @@
+import json
+
 import flask
 from flask import Blueprint
 
@@ -9,7 +11,7 @@ settings_bp = Blueprint('settings', __name__, url_prefix='/settings')
 
 @settings_bp.route('/', methods=['GET'])
 def get_settings():
-    return success_response(controller.get_settings())
+    return success_response(controller.get_settings(as_data=True))
 
 
 @settings_bp.route('/schema', methods=['GET'])

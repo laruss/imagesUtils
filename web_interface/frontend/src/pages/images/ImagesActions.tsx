@@ -57,6 +57,11 @@ const ImagesActions = () => {
                     label: 'minimize',
                     apiMutation: api.useOptimizeImagesMinimizeMutation,
                     color: 'info'
+                },
+                {
+                    onClick,
+                    label: 'delete duplicates',
+                    apiMutation: api.useOptimizeImagesDuplicatesMutation,
                 }
             ]
         },

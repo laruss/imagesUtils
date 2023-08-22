@@ -1,80 +1,48 @@
-from typing import Union, Literal
+from typing import Union
 
 from core.utils import read_json_from_file, write_json_to_file
 from web_interface.backend.helpers.json_schema import JsonSchemaGenerator
 from web_interface.backend.settings import settings_file_path, settings_data_schema_file_path
 
-from download.settings import DownloadSettings as DownloadSettings
-from optimize.settings import OptimizeSettings
-from description.settings import DescriptionSettings
-from cloud.settings import CloudSettings
-from core.settings import CoreSettings
-
-
-def _get_settings_models():
-    return {
-        'download': DownloadSettings,
-        'optimize': OptimizeSettings,
-        'description': DescriptionSettings,
-        'cloud': CloudSettings,
-        'core': CoreSettings
-    }
-
-
-def _get_settings_schema() -> dict:
-    return read_json_from_file(settings_data_schema_file_path, False)
-
-
-def _create_settings_schema() -> dict:
-    models = _get_settings_models()
-    schema = {}
-
-    for model_name, model in models.items():
-        schema[model_name] = model.model_json_schema(schema_generator=JsonSchemaGenerator)
-
-    write_json_to_file(schema, settings_data_schema_file_path, True, True)
-
-    return schema
+from core.settings import AllSettings
 
 
 def _get_settings_data() -> dict:
     return read_json_from_file(settings_file_path, False)
 
 
-def _create_settings_data() -> dict:
-    models = _get_settings_models()
-    data = {}
-
-    for model_name, model in models.items():
-        data[model_name] = model().model_dump()
-
-    write_json_to_file(data, settings_file_path, True, True)
-
-    return data
+def _get_settings_schema_data() -> dict:
+    return read_json_from_file(settings_data_schema_file_path, False)
 
 
-def get_settings() -> dict:
-    return _get_settings_data() or _create_settings_data()
+def _write_settings_to_file(settings: dict = None) -> dict:
+    settings = settings or AllSettings().model_dump()
+    write_json_to_file(settings, settings_file_path, True, True)
+
+    return _get_settings_data()
 
 
-def get_settings_as_model(
-        model_name: Literal['download', 'optimize', 'description', 'cloud', 'core']
-) -> Union[DownloadSettings, OptimizeSettings, DescriptionSettings, CloudSettings, CoreSettings]:
-    models = _get_settings_models()
+def _write_settings_schema_to_file() -> dict:
+    schema = AllSettings().model_json_schema(schema_generator=JsonSchemaGenerator)
+    write_json_to_file(schema, settings_data_schema_file_path, True, True)
 
-    return models[model_name](**get_settings()[model_name])
+    return _get_settings_schema_data()
+
+
+def get_settings(as_data: bool = False) -> Union[AllSettings, dict]:
+    settings_data = _get_settings_data() or _write_settings_to_file()
+
+    return AllSettings(**settings_data) if not as_data else settings_data
 
 
 def get_settings_schema() -> dict:
-    return _get_settings_schema() or _create_settings_schema()
+    return _get_settings_schema_data() or _write_settings_schema_to_file()
 
 
 def set_settings(new_data: dict) -> dict:
-    get_settings()  # create settings file if it doesn't exist
-    write_json_to_file(new_data, settings_file_path, rewrite=True)
-
-    return new_data
+    _ = AllSettings(**new_data)
+    return _write_settings_to_file(new_data)
 
 
 def reset_settings() -> dict:
-    return set_settings(_create_settings_data())
+    return set_settings(_write_settings_to_file())

@@ -43,6 +43,13 @@ def optimize_images_minimize():
     return success_response(message=message)
 
 
+@api_bp.route('/optimize/duplicates', methods=['DELETE'])
+def optimize_images_duplicates():
+    message = controller.optimize_images(OptimizeMethods.delete_duplicates)
+
+    return success_response(message=message)
+
+
 @api_bp.route('/description', methods=['POST'])
 def describe_images():
     message = controller.describe_images()

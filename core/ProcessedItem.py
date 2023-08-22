@@ -1,15 +1,21 @@
 import json
 import logging
-from typing import Optional, Union, Tuple
+from typing import Optional, Union, Tuple, BinaryIO, List, Dict
 
+import requests
 from pydantic import BaseModel
 
+from core.settings import AllSettings
+from core.utils import get_logger
 from description.prompt_schema import GPTResponseJSON
-from description.settings import DescriptionInitSettings, GPTSettings, NSFWDetectionSettings
-from optimize.settings import OptimizeSettings as OptimizeSettings
+from optimize.duplicates import get_duplicates_for_image
+
+logger = get_logger()
 
 
 class ProcessedItem(BaseModel):
+    _settings: AllSettings = AllSettings()
+    _is_deleted: bool = False
     id: Union[int, str]
     title: str
     media: str
@@ -18,31 +24,60 @@ class ProcessedItem(BaseModel):
     gptText: Optional[str] = None
 
     @property
-    def image(self) -> str:
+    def image(self) -> Optional[str]:
+        """
+        Get image path
+        :return: str or None if image does not exist
+        """
         from core.images_utils import get_image_path_by_id
 
         return get_image_path_by_id(self.id)
 
-    def describe(self, settings: DescriptionInitSettings = DescriptionInitSettings()) -> Tuple[str, bool]:
+    def io_image(self, url: str = None) -> BinaryIO:
+        if self.image:
+            return open(self.image, 'rb')
+        elif url:
+            return requests.get(url, stream=True).raw
+        else:
+            raise Exception("Either image or url should be provided")
+
+    def get_duplicates(self, hashes: Dict[str, str] = None) -> List[str]:
+        """
+        Get duplicates for image
+        :param hashes: dict {file_path: hash}, if not provided, will be generated in get_duplicates_for_image
+        :return: str, list of paths to duplicates
+        """
+        io_image = self.io_image(self.media)
+        folder_path = self._settings.core.images_folder if not hashes else None
+        duplicates = get_duplicates_for_image(io_image, folder_path=folder_path, hashes=hashes)
+
+        if self.image and self.image in duplicates:
+            duplicates.remove(self.image)
+
+        return duplicates
+
+    def describe(self) -> Tuple[str, bool]:
         """
         Describe image
-        :param settings:
         :return: description, bool whether description was generated
         """
-        from description.utils import describe
-
         if not self.description:
-            self.description = describe(self, settings)
+            self.description = self.description_utils.describe(self)
             self.save()
             return self.description, True
 
         return self.description, False
 
-    def process_by_gpt(self, settings: GPTSettings = GPTSettings()) -> Tuple[Optional[str], bool]:
+    def gpt(self) -> Tuple[Optional[str], bool]:
+        """
+        Process image by gpt
+        :return: gpt text, bool whether gpt text was generated
+        """
         from description.gpt import gpt
+        gpt_settings = self._settings.description.gpt_settings
 
-        if not self.gptText or not settings.skip_gpt_if_gpted:
-            self.gptText = gpt(self, settings)
+        if not self.gptText or not gpt_settings.skip_gpt_if_gpted:
+            self.gptText = gpt(self, gpt_settings)
             self.save()
 
             if self.gptText:
@@ -50,16 +85,18 @@ class ProcessedItem(BaseModel):
 
         return self.gptText, False
 
-    def gpt2json(self, settings: GPTSettings = GPTSettings()) -> Tuple[Optional[str], bool]:
-        from description.utils import gpt2json
-
-        if not settings.use_prompt_schema:
+    def gpt2json(self) -> Tuple[Optional[str], bool]:
+        """
+        Get gpt2json
+        :return: gpt2json, bool whether json was generated
+        """
+        if not self._settings.description.gpt_settings.use_prompt_schema:
             logging.warning("Prompt schema is disabled, gpt2json will return None")
 
             return None, False
 
         if not self.gptJSON:
-            self.gptJSON = gpt2json(self)
+            self.gptJSON = self.description_utils.gpt2json(self)
             self.save()
 
             if self.gptJSON:
@@ -67,14 +104,29 @@ class ProcessedItem(BaseModel):
 
         return json.dumps(self.gptJSON.model_dump()), False
 
-    def to_webp(self, settings: OptimizeSettings = OptimizeSettings()) -> Tuple[str, bool]:
+    @property
+    def optimize_utils(self):
+        from optimize.utils import OptimizeUtils
+
+        return OptimizeUtils(self._settings.optimize, self._settings.core)
+
+    @property
+    def download_utils(self):
+        from download.utils import DownloadUtils
+
+        return DownloadUtils(self._settings.download, self._settings.core)
+
+    @property
+    def description_utils(self):
+        from description.utils import DescriptionUtils
+
+        return DescriptionUtils(self._settings.description)
+
+    def to_webp(self) -> Tuple[str, bool]:
         """
         Convert image to webp format
-        :param settings:
         :return: image path, bool whether image was converted
         """
-        from optimize.utils import one_to_webp
-
         image = self.image
         if not image:
             raise Exception(f"File {image} does not exist.")
@@ -82,49 +134,55 @@ class ProcessedItem(BaseModel):
         if image.endswith('.webp'):
             return image, False
 
-        one_to_webp(image, settings)
+        self.optimize_utils.one_to_webp(image)
 
         return self.image, True
 
-    def optimize(self, settings: OptimizeSettings = OptimizeSettings()) -> Tuple[str, bool]:
-        from optimize.utils import minimize_one
-
+    def minimize(self) -> Tuple[str, bool]:
         image = self.image
         if not image:
             raise Exception(f"File {image} does not exist.")
 
-        return self.image, minimize_one(image, settings)
+        return self.image, self.optimize_utils.minimize_one(image)
 
     def save(self) -> None:
         from core.utils import read_json_from_file, write_json_to_file, get_logger
-        from core.settings import CoreSettings
 
         logger = get_logger()
 
-        core_settings = CoreSettings()
-
-        data = read_json_from_file(core_settings.data_file)
+        data = read_json_from_file(self._settings.core.data_file)
         data[self.id] = self.model_dump()
-        write_json_to_file(data, core_settings.data_file, rewrite=True)
+        write_json_to_file(data, self._settings.core.data_file, rewrite=True)
 
         self.save_image()
 
         logger.info(f"Image data for '{self.id}' successfully saved.")
 
     def delete(self):
+        """
+        Delete image and its data
+        :return: None
+        """
         from core.images_utils import delete_image_data
 
         delete_image_data(self.id)
+        self._is_deleted = True
+        logger.info(f"Image data for '{self.id}' successfully deleted.")
 
-    def delete_if_nsfw(self, settings: NSFWDetectionSettings = NSFWDetectionSettings()) -> Tuple[str, bool]:
-        from description.utils import delete_nsfw
-
-        return '', delete_nsfw(self, settings)
+    def delete_nsfw(self) -> Tuple[str, bool]:
+        """
+        Delete image if it is nsfw
+        :return: image path, bool whether image was deleted
+        """
+        return '', self.description_utils.delete_nsfw(self)
 
     def save_image(self) -> None:
-        from download.utils import download_image
-
+        """
+        Save image and its data
+        :return: None
+        """
         try:
-            self.image
+            _ = self.image
+            logger.info(f"Image file '{self.id}' already exists, skipping")
         except Exception:
-            download_image(self)
+            self.download_utils.download_image(self)

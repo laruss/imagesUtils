@@ -9,44 +9,58 @@ from core.ProcessedItem import ProcessedItem
 
 from download.controllers import Sources as ControllerSources
 from download.settings import DownloadSettings
-
+from optimize.duplicates import get_files_hashes
 
 logger = get_logger()
 
 
-def download_image(post: ProcessedItem, core_settings: CoreSettings = CoreSettings()) -> None:
-    logger.info(f"Downloading image: {post.title}")
+class DownloadUtils:
+    def __init__(self, settings: DownloadSettings = DownloadSettings(), core_settings: CoreSettings = CoreSettings()):
+        self.settings = settings
+        self.core_settings = core_settings
 
-    raw_image = None
-    image_path = f"{core_settings.images_folder}/{post.id}.jpg"
+    @staticmethod
+    def download_image(item: ProcessedItem) -> None:
+        logger.info(f"Downloading image: {item.title or item.id} from {item.media}")
 
-    try:
-        raw_image = Image.open(requests.get(post.media, stream=True).raw).convert('RGB')
-        raw_image.save(image_path)
-    except Exception as e:
-        logger.error(f"Skipping {post.id}, {e}")
+        raw_image = None
+        image_path = f"{item._settings.core.images_folder}/{item.id}.jpg"
 
-    if raw_image:
-        logger.info(f"Saved {post.media} to {image_path}")
-        raw_image.close()
+        try:
+            raw_image = Image.open(requests.get(item.media, stream=True).raw).convert('RGB')
+            raw_image.save(image_path)
+        except Exception as e:
+            logger.error(f"Skipping {item.id}, {e}")
 
+        if raw_image:
+            logger.info(f"Saved {item.media} to {item.image}")
+            raw_image.close()
 
-def flow(
-        settings: DownloadSettings = DownloadSettings(),
-        core_settings: CoreSettings = CoreSettings()
-) -> List[ProcessedItem]:
-    source = getattr(ControllerSources, settings.source.name)
+    def flow(self) -> List[ProcessedItem]:
+        source = getattr(ControllerSources, self.settings.source.name)
 
-    posts: List[ProcessedItem] = source(limit=settings.images_limit, query=settings.prompt)[:settings.images_limit]
+        limit = self.settings.images_limit or 1
+        prompt = self.settings.prompt
 
-    for post in posts:
-        all_posts_data = read_json_from_file(core_settings.data_file, False) or {}
+        items: List[ProcessedItem] = source(limit=limit, query=prompt)[:limit]
+        processed_items = []
 
-        if str(post.id) in all_posts_data.keys():
-            logger.info(f"Skipping {post.id}, already in saved data")
-            continue
+        hashes = get_files_hashes(self.core_settings.images_folder) if self.settings.check_duplicates else None
+        for item in items:
+            all_items_data = read_json_from_file(self.core_settings.data_file, False) or {}
 
-        download_image(post, core_settings)
-        post.save()
+            if str(item.id) in all_items_data.keys():
+                logger.info(f"Skipping {item.id}, already in saved data")
+                continue
 
-    return posts
+            if self.settings.check_duplicates:
+                duplicates = item.get_duplicates(hashes)
+                if duplicates:
+                    logger.info(f"Skipping {item.id}, duplicates found: {duplicates}")
+                    continue
+
+            self.download_image(item)
+            item.save()
+            processed_items.append(item)
+
+        return processed_items

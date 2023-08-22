@@ -6,7 +6,8 @@ import flask
 
 from core.ProcessedItem import ProcessedItem
 from core.utils import read_json_from_file
-from web_interface.backend.controllers.settings import get_settings_as_model
+from web_interface.backend.controllers.images import get_image_model
+from web_interface.backend.controllers.settings import get_settings
 
 
 def _response(data: dict, status: int = 200, mimetype: str = 'application/json') -> flask.Response:
@@ -26,13 +27,9 @@ def success_response(data: Union[dict, list] = None, message: str = None) -> fla
 
 
 def get_images_models(*images_ids: str) -> list[ProcessedItem]:
-    settings = get_settings_as_model('core')
-    images_data = read_json_from_file(settings.data_file)
+    images_ids = images_ids or read_json_from_file(get_settings().core.data_file).keys()
 
-    if images_ids:
-        return [ProcessedItem(**images_data[image_id]) for image_id in images_ids]
-
-    return [ProcessedItem(**val) for key, val in images_data.items()]
+    return [get_image_model(image_id) for image_id in images_ids]
 
 
 def error_handler(func):

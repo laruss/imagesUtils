@@ -2,6 +2,9 @@
 
 This submodule contains the scripts to upload the static files to the cloud storage.
 
+- [x] upload files to Google Drive or Yandex Disk
+- [x] download files from Google Drive or Yandex Disk
+
 ## Installation
 
 ```bash
@@ -45,3 +48,7 @@ Profit.
 python ./cloud/main.py --source google --method upload
 python ./cloud/main.py --source yandex --method download
 ```
+
+## TODO
+
+- [ ] add onedrive support

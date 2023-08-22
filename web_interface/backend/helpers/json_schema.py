@@ -18,9 +18,9 @@ class JsonSchemaGenerator(GenerateJsonSchema):
         json_schema = super().generate(schema, mode=mode)
         json_schema = _get_schema_with_required(json_schema)
 
-        if json_schema['title'] == 'CoreSettings':
-            json_schema['description'] = 'These settings can be changed only in core module.'
-            for prop_name in json_schema["properties"].keys():
-                json_schema['properties'][prop_name]['readOnly'] = True
+        if "$defs" in json_schema and "CoreSettings" in json_schema["$defs"]:
+            json_schema["$defs"]["CoreSettings"]["description"] = "These settings can be changed only in core module."
+            for prop_name in json_schema["$defs"]["CoreSettings"]["properties"].keys():
+                json_schema["$defs"]["CoreSettings"]["properties"][prop_name]["readOnly"] = True
 
         return json_schema
