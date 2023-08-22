@@ -5,6 +5,7 @@ This submodule contains the scripts to optimize the images size and quality.
 - [x] optimize images size
 - [x] convert images to webp format
 - [x] search for duplicates and similar images
+- [x] cartoonize images
 
 ## Installation
 
@@ -19,4 +20,6 @@ you can run the script with arguments or, changing the `./download/settings.py` 
 ```bash
 python ./optimize/main.py --method to_webp --silent
 python ./optimize/main.py --method minimize
+python ./optimize/main.py --method delete_duplicates
+python ./optimize/main.py --method cartoonize
 ```

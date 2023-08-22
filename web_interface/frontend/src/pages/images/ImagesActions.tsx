@@ -54,6 +54,12 @@ const ImagesActions = () => {
                 },
                 {
                     onClick,
+                    label: 'cartoonize',
+                    apiMutation: api.useOptimizeImagesCartoonizeMutation,
+                    color: 'info'
+                },
+                {
+                    onClick,
                     label: 'minimize',
                     apiMutation: api.useOptimizeImagesMinimizeMutation,
                     color: 'info'

@@ -98,6 +98,13 @@ export const api = createApi({
             }),
             invalidatesTags: ['imageData', 'images'],
         }),
+        cartoonizeImage: builder.mutation({
+            query: ({id}) => ({
+                url: `/images/${id}/cartoonize`,
+                method: 'PUT',
+            }),
+            invalidatesTags: ['imageData'],
+        }),
         // all images
         downloadImages: builder.mutation({
             query: () => ({
@@ -153,6 +160,13 @@ export const api = createApi({
                 method: 'DELETE',
             }),
             invalidatesTags: ['images'],
+        }),
+        optimizeImagesCartoonize: builder.mutation({
+            query: () => ({
+                url: `/optimize/cartoonize`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['images', 'imageData'],
         }),
         cloudUpload: builder.mutation({
             query: () => ({

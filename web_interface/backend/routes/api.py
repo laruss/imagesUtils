@@ -50,6 +50,13 @@ def optimize_images_duplicates():
     return success_response(message=message)
 
 
+@api_bp.route("/optimize/cartoonize", methods=["POST"])
+def optimize_images_cartoonize():
+    message = controller.optimize_images(OptimizeMethods.cartoonize)
+
+    return success_response(message=message)
+
+
 @api_bp.route("/description", methods=["POST"])
 def describe_images():
     message = controller.describe_images()

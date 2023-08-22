@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 from typing import Optional, Union, Tuple, BinaryIO, List, Dict
@@ -34,6 +36,11 @@ class ProcessedItem(BaseModel):
         return get_image_path_by_id(self.id)
 
     def io_image(self, url: str = None) -> BinaryIO:
+        """
+        Get image as io
+        :param url: str, url to image
+        :return: BinaryIO
+        """
         if self.image:
             return open(self.image, "rb")
         elif url:
@@ -142,13 +149,32 @@ class ProcessedItem(BaseModel):
         return self.image, True
 
     def minimize(self) -> Tuple[str, bool]:
+        """
+        Minimize image
+        :return: path, bool whether image was minimized
+        """
         image = self.image
         if not image:
             raise Exception(f"File {image} does not exist.")
 
         return self.image, self.optimize_utils.minimize_one(image)
 
+    def cartoonize(self) -> Tuple[str, bool]:
+        """
+        Cartoonize image
+        :return: path, bool whether image was cartoonized
+        """
+        image = self.image
+        if not image:
+            raise Exception(f"File {image} does not exist.")
+
+        return self.image, self.optimize_utils.cartoonize_one(image)
+
     def save(self) -> None:
+        """
+        Save image data
+        :return: None
+        """
         from core.utils import read_json_from_file, write_json_to_file, get_logger
 
         logger = get_logger()

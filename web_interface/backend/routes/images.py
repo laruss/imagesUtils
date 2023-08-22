@@ -20,7 +20,6 @@ def list_images():
 @images_bp.route("/<image_id>", methods=["GET"])
 @error_handler
 def get_image(image_id):
-    print(image_id)
     return controller.get_image(image_id)
 
 
@@ -89,3 +88,11 @@ def optimize(image_id):
     controller.optimize_image(image_id)
 
     return success_response(message="Image was optimized")
+
+
+@images_bp.route("/<image_id>/cartoonize", methods=["PUT"])
+@error_handler
+def cartoonize(image_id):
+    controller.cartoonize(image_id)
+
+    return success_response(message="Image was cartoonized")

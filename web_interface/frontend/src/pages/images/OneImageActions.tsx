@@ -47,6 +47,12 @@ const OneImageActions = ({image}: ImageActionsProps) => {
         },
         {
             onClick,
+            label: 'cartoonize',
+            apiMutation: api.useCartoonizeImageMutation,
+            color: 'info'
+        },
+        {
+            onClick,
             label: 'delete',
             apiMutation: api.useDeleteImageMutation,
             color: 'error',

@@ -1,4 +1,7 @@
-from typing import Optional
+import os
+from typing import Optional, Union
+
+from PIL import Image
 
 from core.settings import CoreSettings
 from core.utils import read_json_from_file, write_json_to_file, get_logger
@@ -56,3 +59,29 @@ def delete_image_data(image_id: str) -> None:
     write_json_to_file(data, core_settings.data_file, rewrite=True)
 
     logger.info(f"Image data for '{image_id}' successfully deleted.")
+
+
+def download_from_url(url: str, path: Union[str, os.PathLike]) -> bool:
+    """
+    Download file from url to path
+
+    :param url: str, url to download
+    :param path: str, path to save
+    :return: None
+    """
+    import requests
+
+    raw_image = None
+
+    try:
+        raw_image = Image.open(requests.get(url, stream=True).raw).convert("RGB")
+        raw_image.save(path)
+    except Exception as e:
+        logger.error(f"Skipping {url}, {e}")
+
+    if raw_image:
+        logger.info(f"Saved {url} to {path}")
+        raw_image.close()
+        return True
+
+    return False

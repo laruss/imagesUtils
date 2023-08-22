@@ -7,6 +7,7 @@ from core.ProcessedItem import ProcessedItem
 from core.images_utils import get_id_by_image_path
 from core.settings import CoreSettings
 from core.utils import get_logger
+from optimize.cartoonize import cartoonize
 from optimize.duplicates import get_files_hashes, get_duplicates_for_image
 from optimize.settings import OptimizeSettings
 
@@ -43,6 +44,23 @@ class OptimizeUtils:
                 os.remove(image_path)
 
             logger.info(f"Image {image_path} was converted.")
+
+    def cartoonize_one(self, image_path: str) -> bool:
+        """
+        Cartoonize one image
+        :param image_path: str, path to image
+        :return: bool, whether image was cartoonized
+        """
+        if not os.path.exists(image_path):
+            raise Exception(f"File {image_path} does not exist.")
+        
+        image_id = get_id_by_image_path(image_path)
+
+        final_path = image_path \
+            if self.settings.cartoonize.replace_original \
+            else f"{self.core_settings.images_folder}/{image_id}{self.settings.cartoonize.image_postfix}.jpg"
+
+        return cartoonize(image_path, final_path, self.settings.cartoonize)
 
     def minimize_one(self, image_path: str) -> bool:
         """
@@ -87,10 +105,7 @@ class OptimizeUtils:
         processed_items = []
 
         for item in items:
-            if method_name == "minimize":
-                image_path, result = item.minimize()
-            else:
-                image_path, result = item.to_webp()
+            image_path, result = item.minimize() if method_name == "minimize" else item.to_webp()
 
             if result:
                 processed_items.append(item)
@@ -116,6 +131,17 @@ class OptimizeUtils:
                 duplicates[item.id] = item.get_duplicates()
 
         return [item for item in items if item._is_deleted]
+
+    @staticmethod
+    def cartoonize(items: List[ProcessedItem]) -> List[ProcessedItem]:
+        processed_items = []
+
+        for item in items:
+            _, result = item.cartoonize()
+            if result:
+                processed_items.append(item)
+
+        return processed_items
 
     def flow(self, items: List[ProcessedItem]) -> List[ProcessedItem]:
         return self.__getattribute__(self.settings.method.name)(items)

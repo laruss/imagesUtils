@@ -3,6 +3,7 @@ from typing import List
 import requests
 from PIL import Image
 
+from core.images_utils import download_from_url
 from core.settings import CoreSettings
 from core.utils import get_logger, read_json_from_file
 from core.ProcessedItem import ProcessedItem
@@ -27,20 +28,9 @@ class DownloadUtils:
     def download_image(item: ProcessedItem) -> None:
         logger.info(f"Downloading image: {item.title or item.id} from {item.media}")
 
-        raw_image = None
         image_path = f"{item._settings.core.images_folder}/{item.id}.jpg"
 
-        try:
-            raw_image = Image.open(requests.get(item.media, stream=True).raw).convert(
-                "RGB"
-            )
-            raw_image.save(image_path)
-        except Exception as e:
-            logger.error(f"Skipping {item.id}, {e}")
-
-        if raw_image:
-            logger.info(f"Saved {item.media} to {item.image}")
-            raw_image.close()
+        download_from_url(item.media, image_path)
 
     def flow(self) -> List[ProcessedItem]:
         source = getattr(ControllerSources, self.settings.source.name)
