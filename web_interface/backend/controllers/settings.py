@@ -2,7 +2,10 @@ from typing import Union
 
 from core.utils import read_json_from_file, write_json_to_file
 from web_interface.backend.helpers.json_schema import JsonSchemaGenerator
-from web_interface.backend.settings import settings_file_path, settings_data_schema_file_path
+from web_interface.backend.settings import (
+    settings_file_path,
+    settings_data_schema_file_path,
+)
 
 from core.settings import AllSettings
 

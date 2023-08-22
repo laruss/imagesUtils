@@ -16,9 +16,7 @@ def create_folder_if_not_exists(folder_path: str) -> None:
 
 
 def upload_zip_to_folder_name(
-        folder_name: str,
-        file_path: str,
-        delete_if_exists: bool = True
+    folder_name: str, file_path: str, delete_if_exists: bool = True
 ) -> None:
     folder_path = f"/{folder_name}" if not folder_name.startswith("/") else folder_name
     zip_name = file_path.split("/")[-1]

@@ -34,4 +34,6 @@ class SubredditPost(BaseModel):
         return max(self.mediaSources, key=lambda x: x.width * x.height)
 
     def get_processed(self) -> ProcessedItem:
-        return ProcessedItem(id=self.id, title=self.title, media=self.get_biggest_media.url)
+        return ProcessedItem(
+            id=self.id, title=self.title, media=self.get_biggest_media.url
+        )

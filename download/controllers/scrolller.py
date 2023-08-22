@@ -17,7 +17,7 @@ query = [
     "disabledHosts: null homePage: true ) { iterator items { __typename id url title subredditId subredditTitle "
     "subredditUrl redditPath isNsfw albumUrl hasAudio fullLengthSource gfycatSource redgifsSource ownerAvatar "
     "username displayName isPaid tags isFavorite mediaSources { url width height isOptimized } blurredMediaSources "
-    "{ url width height isOptimized } } } } } }"
+    "{ url width height isOptimized } } } } } }",
 ]
 
 query_for_subreddit = [
@@ -40,7 +40,7 @@ headers = {
     "sec-fetch-dest": "empty",
     "sec-fetch-mode": "cors",
     "sec-fetch-site": "same-site",
-    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ",
 }
 
 
@@ -57,21 +57,25 @@ def _get_items_by_subreddit(subreddit: str) -> Result:
         "authorization": None,
     }
 
-    response = requests.post("https://api.scrolller.com/api/v2/graphql", json=data, headers=headers)
+    response = requests.post(
+        "https://api.scrolller.com/api/v2/graphql", json=data, headers=headers
+    )
 
     if response.status_code != 200:
-        raise Exception(f"Error {response.status_code} while fetching items from scrolller.com")
+        raise Exception(
+            f"Error {response.status_code} while fetching items from scrolller.com"
+        )
 
     logger.info("Got items from scrolller.com")
 
-    return Result(**{"iterator": "", "items": [response.json()["data"]["getSubreddit"]]})
+    return Result(
+        **{"iterator": "", "items": [response.json()["data"]["getSubreddit"]]}
+    )
 
 
 def _get_items(
-        iterator: str = None,
-        limit: int = 50,
-        nsfw: bool = False,
-        subreddit: str = None) -> Result:
+    iterator: str = None, limit: int = 50, nsfw: bool = False, subreddit: str = None
+) -> Result:
     logger.info(f"Fetching items from scrolller.com with iterator {iterator}")
 
     if subreddit:
@@ -91,7 +95,9 @@ def _get_items(
         "authorization": None,
     }
 
-    response = requests.post("https://api.scrolller.com/api/v2/graphql", json=data, headers=headers)
+    response = requests.post(
+        "https://api.scrolller.com/api/v2/graphql", json=data, headers=headers
+    )
 
     if response.status_code != 200:
         raise Exception(f"Error {response.status_code} when fetching items")
@@ -105,7 +111,9 @@ def _get_items(
 
 def get_items(limit: int = 50, query: str = None) -> List[ProcessedItem]:
     settings = DownloadSettings()
-    result_ = _get_items(nsfw=settings.scroller.nsfw, limit=limit, subreddit=settings.scroller.subreddit)
+    result_ = _get_items(
+        nsfw=settings.scroller.nsfw, limit=limit, subreddit=settings.scroller.subreddit
+    )
     posts_list = [item.get_processed_posts() for item in result_.items]
 
     return [post for posts in posts_list for post in posts]

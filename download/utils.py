@@ -15,7 +15,11 @@ logger = get_logger()
 
 
 class DownloadUtils:
-    def __init__(self, settings: DownloadSettings = DownloadSettings(), core_settings: CoreSettings = CoreSettings()):
+    def __init__(
+        self,
+        settings: DownloadSettings = DownloadSettings(),
+        core_settings: CoreSettings = CoreSettings(),
+    ):
         self.settings = settings
         self.core_settings = core_settings
 
@@ -27,7 +31,9 @@ class DownloadUtils:
         image_path = f"{item._settings.core.images_folder}/{item.id}.jpg"
 
         try:
-            raw_image = Image.open(requests.get(item.media, stream=True).raw).convert('RGB')
+            raw_image = Image.open(requests.get(item.media, stream=True).raw).convert(
+                "RGB"
+            )
             raw_image.save(image_path)
         except Exception as e:
             logger.error(f"Skipping {item.id}, {e}")
@@ -45,9 +51,15 @@ class DownloadUtils:
         items: List[ProcessedItem] = source(limit=limit, query=prompt)[:limit]
         processed_items = []
 
-        hashes = get_files_hashes(self.core_settings.images_folder) if self.settings.check_duplicates else None
+        hashes = (
+            get_files_hashes(self.core_settings.images_folder)
+            if self.settings.check_duplicates
+            else None
+        )
         for item in items:
-            all_items_data = read_json_from_file(self.core_settings.data_file, False) or {}
+            all_items_data = (
+                read_json_from_file(self.core_settings.data_file, False) or {}
+            )
 
             if str(item.id) in all_items_data.keys():
                 logger.info(f"Skipping {item.id}, already in saved data")

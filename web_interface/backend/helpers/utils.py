@@ -10,7 +10,9 @@ from web_interface.backend.controllers.images import get_image_model
 from web_interface.backend.controllers.settings import get_settings
 
 
-def _response(data: dict, status: int = 200, mimetype: str = 'application/json') -> flask.Response:
+def _response(
+    data: dict, status: int = 200, mimetype: str = "application/json"
+) -> flask.Response:
     return flask.Response(json.dumps(data), status=status, mimetype=mimetype)
 
 
@@ -20,7 +22,9 @@ def not_found_response(data: dict = None) -> flask.Response:
     return _response(data, status=404)
 
 
-def success_response(data: Union[dict, list] = None, message: str = None) -> flask.Response:
+def success_response(
+    data: Union[dict, list] = None, message: str = None
+) -> flask.Response:
     data = {"message": message} if message else (data or {"success": True})
 
     return _response(data)

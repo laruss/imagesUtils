@@ -9,7 +9,7 @@ from transformers import BlipProcessor, BlipForConditionalGeneration
 from core.ProcessedItem import ProcessedItem
 from core.utils import get_logger
 from description.prompt_schema import GPTResponseJSON
-from description.settings import DescriptionSettings, Methods, DescriptionInitSettings, NSFWDetectionSettings
+from description.settings import DescriptionSettings
 
 logger = get_logger()
 
@@ -22,9 +22,9 @@ class DescriptionUtils:
         sightengine = self.settings.nsfw_settings.sightengine
 
         params = {
-            'models': sightengine.models,
-            'api_user': sightengine.api_user,
-            'api_secret': sightengine.api_secret
+            "models": sightengine.models,
+            "api_user": sightengine.api_user,
+            "api_secret": sightengine.api_secret,
         }
 
         try:
@@ -36,14 +36,16 @@ class DescriptionUtils:
 
         result = json.loads(r.text)
 
-        if not result['status'] == 'success':
+        if not result["status"] == "success":
             logger.warning(f"NSFW check failed, status is {result['status']}")
 
             return False
 
-        check = any(result['nudity'][key] > self.settings.is_nsfw for key in
-                    ['sexual_display', 'sexual_activity', 'erotica'])
-        method, text = (logger.warning, 'failed') if check else (logger.info, 'passed')
+        check = any(
+            result["nudity"][key] > self.settings.is_nsfw
+            for key in ["sexual_display", "sexual_activity", "erotica"]
+        )
+        method, text = (logger.warning, "failed") if check else (logger.info, "passed")
         method(f"NSFW check {text}, nsfw is {check}, {result['nudity']}")
 
         return check
@@ -54,17 +56,21 @@ class DescriptionUtils:
         replicate_settings = self.settings.description_settings.replicate
 
         replicate.default_client.api_token = replicate_settings.api_token
-        output = replicate.run(replicate_settings.api_model_version, input={"image": io_image})
+        output = replicate.run(
+            replicate_settings.api_model_version, input={"image": io_image}
+        )
 
-        return output.split(',')[0]
+        return output.split(",")[0]
 
     def _describe_item_transformers(self, io_image: BinaryIO) -> str:
         transformers_settings = self.settings.description_settings.transformers
 
         processor = BlipProcessor.from_pretrained(transformers_settings.api_model_name)
-        model = BlipForConditionalGeneration.from_pretrained(transformers_settings.api_model_name)
+        model = BlipForConditionalGeneration.from_pretrained(
+            transformers_settings.api_model_name
+        )
 
-        raw_image = Image.open(io_image).convert('RGB')
+        raw_image = Image.open(io_image).convert("RGB")
         inputs = processor(raw_image, return_tensors="pt")
 
         out = model.generate(**inputs)
@@ -72,7 +78,9 @@ class DescriptionUtils:
         return processor.decode(out[0], skip_special_tokens=True)
 
     def describe(self, item: ProcessedItem) -> Optional[str]:
-        method = self.__getattribute__(f"_describe_item_{self.settings.description_settings.engine.name}")
+        method = self.__getattribute__(
+            f"_describe_item_{self.settings.description_settings.engine.name}"
+        )
 
         logger.info(f"Describing item: {item.id}")
 

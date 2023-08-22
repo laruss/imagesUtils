@@ -13,22 +13,27 @@ logger = logging.getLogger()
 
 def get_items(limit: int = 50, query: str = "people") -> List[ProcessedItem]:
     download_settings = DownloadSettings()
-    gis = GoogleImagesSearch(download_settings.google.api_key, download_settings.google.cx)
+    gis = GoogleImagesSearch(
+        download_settings.google.api_key, download_settings.google.cx
+    )
 
     _search_params = {
-        'q': query,
-        'num': limit,
-        'safe': 'off',
-        'fileType': 'jpg|png|webp',
-        'rights': 'cc_publicdomain|cc_attribute|cc_sharealike|cc_noncommercial|cc_nonderived',
-        'imgType': 'photo',
-        'imgSize': 'xxlarge',
-        'imgDominantColor': 'imgDominantColorUndefined',
-        'imgColorType': 'imgColorTypeUndefined'
+        "q": query,
+        "num": limit,
+        "safe": "off",
+        "fileType": "jpg|png|webp",
+        "rights": "cc_publicdomain|cc_attribute|cc_sharealike|cc_noncommercial|cc_nonderived",
+        "imgType": "photo",
+        "imgSize": "xxlarge",
+        "imgDominantColor": "imgDominantColorUndefined",
+        "imgColorType": "imgColorTypeUndefined",
     }
 
     gis.search(search_params=_search_params)
 
     logger.info(f"Fetching items from google.com with query '{query}'")
 
-    return [ProcessedItem(id=int(time.time()), title="no title", media=image.url) for image in gis.results()]
+    return [
+        ProcessedItem(id=int(time.time()), title="no title", media=image.url)
+        for image in gis.results()
+    ]

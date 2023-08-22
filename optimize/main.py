@@ -10,8 +10,12 @@ parser = argparse.ArgumentParser()
 
 
 def add_arguments():
-    parser.add_argument("--method", help="method", choices=[method.name for method in Methods],
-                        default=OptimizeSettings().method.name)
+    parser.add_argument(
+        "--method",
+        help="method",
+        choices=[method.name for method in Methods],
+        default=OptimizeSettings().method.name,
+    )
     parser.add_argument("--silent", help="silent mode", action="store_true")
 
 
@@ -28,8 +32,9 @@ def main():
 
     items = read_json_from_file(core_settings.data_file, False) or {}
 
-    OptimizeUtils(optimize_settings, core_settings) \
-        .flow(items=[ProcessedItem(**val) for key, val in items.items()])
+    OptimizeUtils(optimize_settings, core_settings).flow(
+        items=[ProcessedItem(**val) for key, val in items.items()]
+    )
 
 
 if __name__ == "__main__":

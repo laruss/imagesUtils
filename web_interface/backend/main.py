@@ -16,37 +16,37 @@ CORS(app)
 app.register_blueprint(api_bp)
 
 
-@app.route('/', defaults={'path': ''})
+@app.route("/", defaults={"path": ""})
 # @app.route('/<path:path>')
 def serve(path):
     if not os.path.exists(static_folder):
-        return flask.jsonify({'error': 'Static folder not found'}), 500
-    if path != "" and os.path.exists(static_folder + '/' + path):
+        return flask.jsonify({"error": "Static folder not found"}), 500
+    if path != "" and os.path.exists(static_folder + "/" + path):
         return send_from_directory(static_folder, path)
     else:
-        return send_from_directory(static_folder, 'index.html')
+        return send_from_directory(static_folder, "index.html")
 
 
-@app.route('/static/css/<path:path>')
+@app.route("/static/css/<path:path>")
 def send_css(path):
-    return send_from_directory(f'{static_folder}/static/css', path)
+    return send_from_directory(f"{static_folder}/static/css", path)
 
 
-@app.route('/static/js/<path:path>')
+@app.route("/static/js/<path:path>")
 def send_js(path):
-    return send_from_directory(f'{static_folder}/static/js', path)
+    return send_from_directory(f"{static_folder}/static/js", path)
 
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return flask.jsonify({'error': 'route not found'}), 404
+    return flask.jsonify({"error": "route not found"}), 404
 
 
 @app.errorhandler(Exception)
 def internal_server_error(e):
     logging.warning(f"Internal server error: {type(e)} {e}")
-    return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify({"error": str(e)}), 500
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True, host=settings.server.host, port=settings.server.port)

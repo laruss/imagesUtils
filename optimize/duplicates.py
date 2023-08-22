@@ -30,7 +30,9 @@ def get_files_hashes(folder_path: str) -> Dict[str, str]:
     return hashes
 
 
-def get_duplicates_for_image(image: BinaryIO, hashes: Dict[str, str] = None, folder_path: str = None) -> List[str]:
+def get_duplicates_for_image(
+    image: BinaryIO, hashes: Dict[str, str] = None, folder_path: str = None
+) -> List[str]:
     """
     Find duplicates for image and return list of paths to duplicates
     :param image: BinaryIO

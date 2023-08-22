@@ -46,7 +46,8 @@ def delete_image_data(image_id: str) -> None:
     image_path = get_image_path_by_id(image_id)
 
     os.remove(image_path) if image_path else logger.warning(
-        f"Image with id '{image_id}' not found. Skipping deleting image file.")
+        f"Image with id '{image_id}' not found. Skipping deleting image file."
+    )
 
     core_settings = CoreSettings()
 

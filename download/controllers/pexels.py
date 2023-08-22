@@ -33,4 +33,7 @@ def _get_items(query: str = "people", limit: int = 50) -> Result:
 def get_items(limit: int = 50, query: str = "people") -> List[ProcessedItem]:
     photos = _get_items(limit=limit, query=query).photos
 
-    return [ProcessedItem(id=item.id, title=item.alt, media=item.src['original']) for item in photos]
+    return [
+        ProcessedItem(id=item.id, title=item.alt, media=item.src["original"])
+        for item in photos
+    ]

@@ -48,6 +48,8 @@ def cloud_images(method: CloudMethods = CloudMethods.upload) -> str:
     if settings.cloud.method == CloudMethods.download:
         items = get_images_models()
 
-    method = "uploaded" if settings.cloud.method == CloudMethods.upload else "downloaded"
+    method = (
+        "uploaded" if settings.cloud.method == CloudMethods.upload else "downloaded"
+    )
 
     return f"{method.capitalize()} {len(items)} items"

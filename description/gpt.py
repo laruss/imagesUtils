@@ -23,11 +23,12 @@ def use_gpt(prompt: str, settings: GPTSettings = GPTSettings()) -> Optional[str]
 
     try:
         response = openai.ChatCompletion.create(
-            model=settings.model.value,
-            messages=[{"role": "user", "content": prompt}]
+            model=settings.model.value, messages=[{"role": "user", "content": prompt}]
         )
         choice = response.choices[0]
-        assert choice["finish_reason"] == "stop", f"Chat finished unexpectedly: {choice}"
+        assert (
+            choice["finish_reason"] == "stop"
+        ), f"Chat finished unexpectedly: {choice}"
 
         return choice["message"]["content"]
 
@@ -47,8 +48,7 @@ def use_gpt4free(prompt: str, settings: GPTSettings = GPTSettings()) -> Optional
 
     try:
         response = g4f.ChatCompletion.create(
-            model=settings.model.value,
-            messages=[{"role": "user", "content": prompt}]
+            model=settings.model.value, messages=[{"role": "user", "content": prompt}]
         )
 
         return response
@@ -73,14 +73,8 @@ def _get_prompt(item: ProcessedItem, settings: GPTSettings = GPTSettings()) -> s
     return prompt
 
 
-def gpt(
-        item: ProcessedItem,
-        settings: GPTSettings = GPTSettings()
-) -> Optional[str]:
-    mapper = {
-        "openai": use_gpt,
-        "gpt4free": use_gpt4free
-    }
+def gpt(item: ProcessedItem, settings: GPTSettings = GPTSettings()) -> Optional[str]:
+    mapper = {"openai": use_gpt, "gpt4free": use_gpt4free}
 
     if settings.skip_gpt_if_gpted and item.gptText:
         logger.info(f"Skipping {item.id}, already gpted")
@@ -91,7 +85,9 @@ def gpt(
 
     service = settings.service.name
 
-    logger.info(f"Using {service} to process {item.id}, selected prompt is {settings.prompt.name}.")
+    logger.info(
+        f"Using {service} to process {item.id}, selected prompt is {settings.prompt.name}."
+    )
 
     resp_text = mapper[service](prompt_text, settings)
 

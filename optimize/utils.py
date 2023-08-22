@@ -14,7 +14,11 @@ logger = get_logger()
 
 
 class OptimizeUtils:
-    def __init__(self, settings: OptimizeSettings = OptimizeSettings(), core_settings: CoreSettings = CoreSettings()):
+    def __init__(
+        self,
+        settings: OptimizeSettings = OptimizeSettings(),
+        core_settings: CoreSettings = CoreSettings(),
+    ):
         self.settings = settings
         self.core_settings = core_settings
 
@@ -52,29 +56,38 @@ class OptimizeUtils:
         if not os.path.exists(image_path):
             raise Exception(f"File {image_path} does not exist.")
 
-        if self._get_file_size_in_kb(image_path) > self.settings.image_final_size_kb:  # for images larger than file size
+        if (
+            self._get_file_size_in_kb(image_path) > self.settings.image_final_size_kb
+        ):  # for images larger than file size
             with Image.open(image_path) as im:
                 quality = start_image_quality
-                while self._get_file_size_in_kb(image_path) > self.settings.image_final_size_kb and quality > 10:
+                while (
+                    self._get_file_size_in_kb(image_path)
+                    > self.settings.image_final_size_kb
+                    and quality > 10
+                ):
                     im.save(image_path, "WEBP", quality=quality)
                     quality -= 5  # Reduce quality by 5% per iteration
-            logger.info(f"Image {image_path} was optimized, new size: {self._get_file_size_in_kb(image_path)} KB")
+            logger.info(
+                f"Image {image_path} was optimized, new size: {self._get_file_size_in_kb(image_path)} KB"
+            )
 
             return True
         else:
-            logger.info(f"Image {image_path} was not optimized, size: {self._get_file_size_in_kb(image_path)} KB")
+            logger.info(
+                f"Image {image_path} was not optimized, size: {self._get_file_size_in_kb(image_path)} KB"
+            )
 
             return False
 
     @staticmethod
     def _to_webp_or_minimize(
-            method_name: Literal['to_webp', 'minimize'],
-            items: List[ProcessedItem]
+        method_name: Literal["to_webp", "minimize"], items: List[ProcessedItem]
     ) -> List[ProcessedItem]:
         processed_items = []
 
         for item in items:
-            if method_name == 'minimize':
+            if method_name == "minimize":
                 image_path, result = item.minimize()
             else:
                 image_path, result = item.to_webp()
@@ -85,10 +98,10 @@ class OptimizeUtils:
         return processed_items
 
     def to_webp(self, items: List[ProcessedItem]) -> List[ProcessedItem]:
-        return self._to_webp_or_minimize('to_webp', items)
+        return self._to_webp_or_minimize("to_webp", items)
 
     def minimize(self, items: List[ProcessedItem]) -> List[ProcessedItem]:
-        return self._to_webp_or_minimize('minimize', items)
+        return self._to_webp_or_minimize("minimize", items)
 
     @staticmethod
     def delete_duplicates(items: List[ProcessedItem]) -> List[ProcessedItem]:

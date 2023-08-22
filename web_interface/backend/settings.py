@@ -1,15 +1,10 @@
 import core.utils
 
-modules = [
-    'download',
-    'optimize',
-    'description',
-    'cloud'
-]
+modules = ["download", "optimize", "description", "cloud"]
 
 
 class server:
-    host = 'localhost'
+    host = "localhost"
     port = 5002
 
 

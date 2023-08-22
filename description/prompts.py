@@ -8,7 +8,7 @@ WARNING: If you want to use formatting in the prompt, use item as instance of Pr
 
 
 class Prompts(str, Enum):
-    default = '''
+    default = """
 The following photo was described as: \"{item.description}\". 
 Also it has the name of \"{item.title}\". 
 
@@ -35,4 +35,4 @@ Return your answer as a VALID JSON object with two fields: 'parameters' (a dicti
 The descriptions should be in different style and in different length, as they were written by different people, some of them may use slang, it could be also that some of them may use emojis as well. Some of them may use just several words or only emojis.
 !If eroticism > 0.2, then descriptions should be made from the human being which displayed on photo!
 Just return the JSON object, don't comment anything.
-'''
+"""

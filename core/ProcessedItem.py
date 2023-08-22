@@ -35,7 +35,7 @@ class ProcessedItem(BaseModel):
 
     def io_image(self, url: str = None) -> BinaryIO:
         if self.image:
-            return open(self.image, 'rb')
+            return open(self.image, "rb")
         elif url:
             return requests.get(url, stream=True).raw
         else:
@@ -49,7 +49,9 @@ class ProcessedItem(BaseModel):
         """
         io_image = self.io_image(self.media)
         folder_path = self._settings.core.images_folder if not hashes else None
-        duplicates = get_duplicates_for_image(io_image, folder_path=folder_path, hashes=hashes)
+        duplicates = get_duplicates_for_image(
+            io_image, folder_path=folder_path, hashes=hashes
+        )
 
         if self.image and self.image in duplicates:
             duplicates.remove(self.image)
@@ -74,6 +76,7 @@ class ProcessedItem(BaseModel):
         :return: gpt text, bool whether gpt text was generated
         """
         from description.gpt import gpt
+
         gpt_settings = self._settings.description.gpt_settings
 
         if not self.gptText or not gpt_settings.skip_gpt_if_gpted:
@@ -131,7 +134,7 @@ class ProcessedItem(BaseModel):
         if not image:
             raise Exception(f"File {image} does not exist.")
 
-        if image.endswith('.webp'):
+        if image.endswith(".webp"):
             return image, False
 
         self.optimize_utils.one_to_webp(image)
@@ -174,7 +177,7 @@ class ProcessedItem(BaseModel):
         Delete image if it is nsfw
         :return: image path, bool whether image was deleted
         """
-        return '', self.description_utils.delete_nsfw(self)
+        return "", self.description_utils.delete_nsfw(self)
 
     def save_image(self) -> None:
         """

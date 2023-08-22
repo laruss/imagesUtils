@@ -6,8 +6,7 @@ from typing import Union, Any
 
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
 
@@ -54,10 +53,7 @@ def create_folder_if_not_exists(path: str) -> None:
 
 
 def write_to_file(
-        data,
-        path: str,
-        create_if_not_exist: bool = True,
-        rewrite: bool = False
+    data, path: str, create_if_not_exist: bool = True, rewrite: bool = False
 ):
     """
     Writes data to a file.
@@ -74,12 +70,12 @@ def write_to_file(
     if not os.path.exists(path):
         if create_if_not_exist:
             os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, 'w') as _:
+            with open(path, "w") as _:
                 pass
         else:
             raise FileNotFoundError(f"The file '{path}' does not exist.")
 
-    mode = 'w' if rewrite else 'a'
+    mode = "w" if rewrite else "a"
     with open(path, mode) as file:
         file.write(data)
 
@@ -96,7 +92,7 @@ def read_from_file(path: str) -> Any:
     if not os.path.exists(path) or not os.path.isfile(path):
         raise FileNotFoundError(f"The file '{path}' does not exist.")
 
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         data = file.read()
 
     logger.info(f"Data successfully read from '{path}'.")
@@ -105,10 +101,10 @@ def read_from_file(path: str) -> Any:
 
 
 def write_json_to_file(
-        data: Union[dict, list],
-        path: str,
-        create_if_not_exist: bool = True,
-        rewrite: bool = False
+    data: Union[dict, list],
+    path: str,
+    create_if_not_exist: bool = True,
+    rewrite: bool = False,
 ):
     """
     Writes JSON data to a file.
@@ -121,7 +117,9 @@ def write_json_to_file(
     write_to_file(json.dumps(data, indent=4), path, create_if_not_exist, rewrite)
 
 
-def read_json_from_file(path: str, error_on_invalid_json=True) -> Union[dict, list, None]:
+def read_json_from_file(
+    path: str, error_on_invalid_json=True
+) -> Union[dict, list, None]:
     """
     Reads JSON data from a file.
 

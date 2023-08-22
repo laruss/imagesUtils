@@ -14,7 +14,7 @@ from cloud.settings import CloudSettings
 from core.utils import get_logger
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/drive']
+SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 logger = get_logger()
 
@@ -42,53 +42,58 @@ class GoogleDriveClient:
         # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        if os.path.exists('token.json'):
-            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+        if os.path.exists("token.json"):
+            creds = Credentials.from_authorized_user_file("token.json", SCOPES)
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', SCOPES)
-                creds = flow.run_local_server(port=CloudSettings.google.local_server_port)
+                    "credentials.json", SCOPES
+                )
+                creds = flow.run_local_server(
+                    port=CloudSettings.google.local_server_port
+                )
             # Save the credentials for the next run
-            with open('token.json', 'w') as token:
+            with open("token.json", "w") as token:
                 token.write(creds.to_json())
 
-        self.service = build('drive', 'v3', credentials=creds)
+        self.service = build("drive", "v3", credentials=creds)
 
         logger.info("Google Drive client initialized")
 
-    def list_files(self,
-                   page_size: int = None,
-                   page_token: str = None,
-                   query: str = None,
-                   spaces: str = 'drive'
-                   ) -> (List[File], Optional[str]):
-        results = self.service.files().list(
-            pageSize=page_size,
-            fields="nextPageToken, files(id, name)",
-            pageToken=page_token,
-            q=query,
-            spaces=spaces
-        ).execute()
+    def list_files(
+        self,
+        page_size: int = None,
+        page_token: str = None,
+        query: str = None,
+        spaces: str = "drive",
+    ) -> (List[File], Optional[str]):
+        results = (
+            self.service.files()
+            .list(
+                pageSize=page_size,
+                fields="nextPageToken, files(id, name)",
+                pageToken=page_token,
+                q=query,
+                spaces=spaces,
+            )
+            .execute()
+        )
         logger.info(f"Found {len(results.get('files', []))} files")
 
-        items = results.get('files', [])
+        items = results.get("files", [])
 
-        files = [File(item['name'], item['id']) for item in items]
+        files = [File(item["name"], item["id"]) for item in items]
 
-        return files, results.get('nextPageToken', None)
+        return files, results.get("nextPageToken", None)
 
     def create_folder(self, name: str) -> File:
-        file_metadata = {
-            'name': name,
-            'mimeType': 'application/vnd.google-apps.folder'
-        }
+        file_metadata = {"name": name, "mimeType": "application/vnd.google-apps.folder"}
 
-        file = self.service.files().create(body=file_metadata, fields='id').execute()
-        file_id = file.get('id')
+        file = self.service.files().create(body=file_metadata, fields="id").execute()
+        file_id = file.get("id")
 
         logger.info(f"Created folder {name} with id {file_id}")
 
@@ -123,32 +128,30 @@ class GoogleDriveClient:
 
         return files[0]
 
-    def upload_to_folder(self,
-                         folder: File,
-                         file_path: str,
-                         file_mime: MimeTypes,
-                         file_name: str = None
-                         ) -> File:
+    def upload_to_folder(
+        self, folder: File, file_path: str, file_mime: MimeTypes, file_name: str = None
+    ) -> File:
         file_name = file_name or os.path.basename(file_path)
 
         logger.info(f"Uploading {file_name} to {folder.name}")
 
-        file_metadata = {
-            'name': file_name,
-            'parents': [folder.id]
-        }
+        file_metadata = {"name": file_name, "parents": [folder.id]}
 
         media = MediaFileUpload(file_path, mimetype=file_mime.value, resumable=True)
-        file = self.service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        file = (
+            self.service.files()
+            .create(body=file_metadata, media_body=media, fields="id")
+            .execute()
+        )
 
         logger.info(f"Uploaded {file_name} to {folder.name}")
 
-        return File(file_name, file.get('id'))
+        return File(file_name, file.get("id"))
 
     def download_file(self, file: File, file_path: str):
         logger.info(f"Downloading {file.name} to {file_path}")
         request = self.service.files().get_media(fileId=file.id)
-        fh = open(file_path, 'wb')
+        fh = open(file_path, "wb")
         downloader = MediaIoBaseDownload(fh, request)
         done = False
         while done is False:
@@ -163,13 +166,12 @@ class GoogleDriveClient:
 
         logger.info(f"Deleted {file.name}")
 
-    def upload_zip_to_folder_name(self,
-                                  folder_name: str,
-                                  file_path: str,
-                                  delete_if_exists: bool = True
-                                  ) -> File:
-        assert len(self.search_for_file_by_name(folder_name, self.mimetypes.FOLDER)) <= 1, \
-            "More than one folder with the same name, please use a unique name"
+    def upload_zip_to_folder_name(
+        self, folder_name: str, file_path: str, delete_if_exists: bool = True
+    ) -> File:
+        assert (
+            len(self.search_for_file_by_name(folder_name, self.mimetypes.FOLDER)) <= 1
+        ), "More than one folder with the same name, please use a unique name"
         folder = self.create_folder_if_not_exists(folder_name)
         file_name = file_path.split("/")[-1]
 
@@ -180,7 +182,9 @@ class GoogleDriveClient:
             if delete_if_exists:
                 self.delete_file(files[0])
             else:
-                logger.warning(f"File {file_name} already exists in {folder.name}, skipping")
+                logger.warning(
+                    f"File {file_name} already exists in {folder.name}, skipping"
+                )
 
         return self.upload_to_folder(folder, file_path, self.mimetypes.ZIP, file_name)
 
@@ -188,10 +192,14 @@ class GoogleDriveClient:
         folders = self.search_for_file_by_name(folder_name, self.mimetypes.FOLDER)
         file_name = file_path.split("/")[-1]
 
-        assert len(folders) == 1, f"Folders with name {folder_name} not found or more than one found ({len(folders)} found)"
+        assert (
+            len(folders) == 1
+        ), f"Folders with name {folder_name} not found or more than one found ({len(folders)} found)"
 
         file = self.search_for_file_by_name(file_name, self.mimetypes.ZIP)
 
-        assert len(file) == 1, f"Zip file with name {file_name} not found or more than one found ({len(file)} found)"
+        assert (
+            len(file) == 1
+        ), f"Zip file with name {file_name} not found or more than one found ({len(file)} found)"
 
         self.download_file(file[0], file_path)
