@@ -170,20 +170,22 @@ class ProcessedItem(BaseModel):
 
         return self.image, self.optimize_utils.cartoonize_one(image)
 
-    def save(self) -> None:
+    def save(self, fall_on_fail: bool = False) -> None:
         """
         Save image data
+
+        :param fall_on_fail: bool, whether to raise exception on fail
         :return: None
         """
         from core.utils import read_json_from_file, write_json_to_file, get_logger
 
         logger = get_logger()
 
+        self.save_image(fall_on_fail)
+
         data = read_json_from_file(self._settings.core.data_file)
         data[self.id] = self.model_dump()
         write_json_to_file(data, self._settings.core.data_file, rewrite=True)
-
-        self.save_image()
 
         logger.info(f"Image data for '{self.id}' successfully saved.")
 
@@ -205,13 +207,16 @@ class ProcessedItem(BaseModel):
         """
         return "", self.description_utils.delete_nsfw(self)
 
-    def save_image(self) -> None:
+    def save_image(self, fall_on_fail: bool = False) -> None:
         """
         Save image and its data
+
+        :param fall_on_fail: bool, whether to raise exception on fail
         :return: None
         """
-        try:
-            _ = self.image
-            logger.info(f"Image file '{self.id}' already exists, skipping")
-        except Exception:
-            self.download_utils.download_image(self)
+        image = self.image
+        if not image:
+            self.download_utils.download_image(self, fall_on_fail)
+            return None
+
+        logger.info(f"Image file '{self.id}' already exists, skipping")

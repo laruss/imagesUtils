@@ -25,12 +25,18 @@ class DownloadUtils:
         self.core_settings = core_settings
 
     @staticmethod
-    def download_image(item: ProcessedItem) -> None:
+    def download_image(item: ProcessedItem, fall_on_fail: bool = False) -> None:
+        """
+        Download image from url
+        :param item: ProcessedItem
+        :param fall_on_fail: bool, whether to raise exception on fail
+        :return: None
+        """
         logger.info(f"Downloading image: {item.title or item.id} from {item.media}")
 
         image_path = f"{item._settings.core.images_folder}/{item.id}.jpg"
 
-        download_from_url(item.media, image_path)
+        download_from_url(item.media, image_path, fall_on_fail)
 
     def flow(self) -> List[ProcessedItem]:
         source = getattr(ControllerSources, self.settings.source.name)

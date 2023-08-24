@@ -10,9 +10,10 @@ export interface ActionButtonProps {
     mutationCallBack?: () => void;
     onClick: (mutationTrigger: MutationTrigger<any>) => void;
     asMenuItem?: boolean;
+    disabled?: boolean;
 }
 
-const ActionButton = ({label, apiMutation, color, mutationCallBack, onClick, asMenuItem}: ActionButtonProps) => {
+const ActionButton = ({label, apiMutation, color, mutationCallBack, onClick, asMenuItem, disabled}: ActionButtonProps) => {
 
     const {mutationTrigger} = useImageDataMutation({
         apiMutationMethod: apiMutation,
@@ -28,6 +29,7 @@ const ActionButton = ({label, apiMutation, color, mutationCallBack, onClick, asM
                 onClick={() => onClick(mutationTrigger)}
                 color={color}
                 style={{zIndex: 5, flexShrink: 0}}
+                disabled={disabled}
             >
                 {label}
             </Button>

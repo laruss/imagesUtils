@@ -61,12 +61,15 @@ def delete_image_data(image_id: str) -> None:
     logger.info(f"Image data for '{image_id}' successfully deleted.")
 
 
-def download_from_url(url: str, path: Union[str, os.PathLike]) -> bool:
+def download_from_url(
+    url: str, path: Union[str, os.PathLike], fall_on_fail: bool = False
+) -> bool:
     """
     Download file from url to path
 
     :param url: str, url to download
     :param path: str, path to save
+    :param fall_on_fail: bool, whether to raise exception on fail
     :return: None
     """
     import requests
@@ -78,6 +81,8 @@ def download_from_url(url: str, path: Union[str, os.PathLike]) -> bool:
         raw_image.save(path)
     except Exception as e:
         logger.error(f"Skipping {url}, {e}")
+        if fall_on_fail:
+            raise e
 
     if raw_image:
         logger.info(f"Saved {url} to {path}")

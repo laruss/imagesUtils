@@ -43,7 +43,7 @@ def error_handler(func):
             return func(*args, **kwargs)
         except Exception as e:
             if isinstance(e, IndexError) or isinstance(e, KeyError):
-                return not_found_response()
+                return not_found_response(data={"error": f"{e}"})
             else:
                 raise e
 

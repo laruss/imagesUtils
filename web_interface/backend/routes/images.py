@@ -4,7 +4,6 @@ from flask import Blueprint
 from web_interface.backend.controllers import images as controller
 from web_interface.backend.helpers.utils import (
     success_response,
-    not_found_response,
     error_handler,
 )
 
@@ -15,6 +14,19 @@ images_bp = Blueprint("images", __name__, url_prefix="/images")
 @error_handler
 def list_images():
     return success_response(controller.get_images_list())
+
+
+@images_bp.route("/", methods=["POST"])
+@error_handler
+def create_image():
+    """
+    Create image
+    flask.request.json = {id, url}
+    :return: flask.Response
+    """
+    controller.create_image(flask.request.json)
+
+    return success_response(message="Image was created")
 
 
 @images_bp.route("/<image_id>", methods=["GET"])

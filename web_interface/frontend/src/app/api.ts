@@ -34,8 +34,19 @@ export const api = createApi({
             providesTags: ['settingsSchema'],
         }),
         getImages: builder.query({
-            query: () => '/images',
+            query: () => '/images/',
             providesTags: ['images'],
+        }),
+        newImage: builder.mutation({
+            query: ({id, url}) => ({
+                url: '/images/',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({id, url}),
+            }),
+            invalidatesTags: ['images', 'imageData'],
         }),
         getImageData: builder.query({
             query: (id: string) => `/images/${id}/data`,

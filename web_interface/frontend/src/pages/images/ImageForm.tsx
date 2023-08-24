@@ -14,12 +14,13 @@ import useGetImageData from "./helpers/useGetImageData";
 
 interface ImageFormProps {
     imageId: string;
+    newImage: null | string;
 }
 
-const ImageForm = ({imageId}: ImageFormProps) => {
+const ImageForm = ({imageId, newImage}: ImageFormProps) => {
     const dispatch = useAppDispatch();
 
-    useGetImageData(imageId);
+    useGetImageData({imageId, newImage});
 
     const imageDataSchema = useAppSelector(selectImageDataSchema);
     const currentImageData = useAppSelector(selectChangedImageData);
@@ -41,13 +42,14 @@ const ImageForm = ({imageId}: ImageFormProps) => {
                 validator={validator}
                 formData={currentImageData}
                 onChange={onChange}
+                disabled={Boolean(newImage)}
             >
                 <Button disabled/>
             </Form>
             <Button
                 variant={'contained'}
                 style={{position: "absolute", top: '1ch', right: '1ch'}}
-                disabled={!dataIsChanged}
+                disabled={!dataIsChanged || Boolean(newImage)}
                 onClick={onSubmit}
                 color={'error'}
             >

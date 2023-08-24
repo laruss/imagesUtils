@@ -1,3 +1,4 @@
+import validators
 from flask import send_file
 
 from core.ProcessedItem import ProcessedItem
@@ -35,6 +36,19 @@ def get_image(image_id):
         raise KeyError(f"Image with id '{image_id}' not found.")
 
     return send_file(image_path, mimetype="image/jpeg")
+
+
+def create_image(data: dict):
+    for key in ["url", "id"]:
+        if key not in data.keys():
+            raise KeyError(f"Key '{key}' is not provided.")
+    if not validators.url(data["url"]):
+        raise ValueError(f"Url '{data['url']}' is not valid.")
+
+    settings = get_settings()
+    ProcessedItem(_settings=settings, id=data["id"], title="", media=data["url"]).save(
+        fall_on_fail=True
+    )
 
 
 def get_image_model(image_id, image_data: dict = None) -> ProcessedItem:

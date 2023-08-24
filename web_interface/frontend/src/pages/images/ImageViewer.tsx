@@ -1,24 +1,29 @@
 import React from "react";
 import ImageGallery from "react-image-gallery";
 import {Box} from "@mui/material";
-import {useAppSelector} from "../../app/hooks";
-import {selectChangedImageData} from "../../app/slices/imagesSlice";
+import UploadFromSourceForm from "./UploadFromSourceForm";
 
 interface ImageViewerProps {
     image: string;
+    newImage: null | string;
 }
 
-const ImageViewer = ({image}: ImageViewerProps) => {
+const ImageViewer = ({image, newImage}: ImageViewerProps) => {
     const link = `/api/images/${image}`;
-    const currentImageData = useAppSelector(selectChangedImageData);
 
     return (
         <Box style={{height: '85vh', overflow: 'auto'}}>
-            <ImageGallery
-                items={[{ original: link }]}
-                renderFullscreenButton={()=>null}
-                renderPlayPauseButton={()=>null}
-            />
+            {
+                newImage ? (
+                    <UploadFromSourceForm imageId={newImage}/>
+                ) : (
+                    <ImageGallery
+                        items={[{ original: link }]}
+                        renderFullscreenButton={()=>null}
+                        renderPlayPauseButton={()=>null}
+                    />
+                )
+            }
         </Box>
     );
 };

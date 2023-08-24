@@ -23,4 +23,5 @@ export interface ImagesState {
     changedImageData: {[key: string]: any},
     dataIsChanged: boolean,
     dataIsValid: boolean,
+    newImage: string | null,
 }
