@@ -184,7 +184,7 @@ class ProcessedItem(BaseModel):
         self.save_image(fall_on_fail)
 
         data = read_json_from_file(self._settings.core.data_file)
-        data[self.id] = self.model_dump()
+        data[self.id] = self.model_dump(mode="json")
         write_json_to_file(data, self._settings.core.data_file, rewrite=True)
 
         logger.info(f"Image data for '{self.id}' successfully saved.")

@@ -62,7 +62,7 @@ def get_image_model(image_id, image_data: dict = None) -> ProcessedItem:
 
 
 def get_image_data(image_id) -> dict:
-    return get_image_model(image_id).model_dump()
+    return get_image_model(image_id).model_dump(mode="json")
 
 
 def get_image_data_schema():
