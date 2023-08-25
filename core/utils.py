@@ -64,7 +64,7 @@ def write_to_file(
     :param rewrite: boolean, whether to rewrite the file if it exists
     :return: None
     """
-    if not data:
+    if data is None:
         raise ValueError("Data is empty.")
 
     if os.path.exists(path) and not os.path.isfile(path):
