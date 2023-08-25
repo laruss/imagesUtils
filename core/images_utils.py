@@ -1,25 +1,25 @@
+import glob
 import os
+import requests
 from typing import Optional, Union
 
 from PIL import Image
 
-from core.settings import CoreSettings
 from core.utils import read_json_from_file, write_json_to_file, get_logger
 
 logger = get_logger()
 
 
-def get_image_path_by_id(image_id: str) -> Optional[str]:
+def get_image_path_by_id(image_id: str, images_folder_path: str) -> Optional[str]:
     """
     Returns the path to the image by its id.
 
     :param image_id: id of the image
+    :param images_folder_path: path to the folder with images
     :return: path to the image
     """
-    import glob
-
     try:
-        return glob.glob(f"{CoreSettings().images_folder}/{image_id}.*")[0]
+        return glob.glob(f"{images_folder_path}/{image_id}.*")[0]
     except IndexError:
         logger.warning(f"Image with id '{image_id}' not found in path.")
         return None
@@ -32,31 +32,29 @@ def get_id_by_image_path(image_path: str) -> str:
     :param image_path: str, path to the image
     :return: str, id of the image
     """
-    import os
-
     return os.path.splitext(os.path.basename(image_path))[0]
 
 
-def delete_image_data(image_id: str) -> None:
+def delete_image_data(
+    image_id: str, images_folder_path: str, data_file_path: str
+) -> None:
     """
     Deletes the image data by its id.
 
     :param image_id: id of the image
+    :param images_folder_path: path to the folder with images
+    :param data_file_path: path to the file with data
     :return: None
     """
-    import os
-
-    image_path = get_image_path_by_id(image_id)
+    image_path = get_image_path_by_id(image_id, images_folder_path)
 
     os.remove(image_path) if image_path else logger.warning(
         f"Image with id '{image_id}' not found. Skipping deleting image file."
     )
 
-    core_settings = CoreSettings()
-
-    data = read_json_from_file(core_settings.data_file)
+    data = read_json_from_file(data_file_path)
     del data[image_id]
-    write_json_to_file(data, core_settings.data_file, rewrite=True)
+    write_json_to_file(data, data_file_path, rewrite=True)
 
     logger.info(f"Image data for '{image_id}' successfully deleted.")
 
@@ -72,8 +70,6 @@ def download_from_url(
     :param fall_on_fail: bool, whether to raise exception on fail
     :return: None
     """
-    import requests
-
     raw_image = None
 
     try:

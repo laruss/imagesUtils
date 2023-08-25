@@ -31,7 +31,8 @@ def get_images_list():
 
 
 def get_image(image_id):
-    image_path = get_image_path_by_id(image_id)
+    settings = get_settings().core
+    image_path = get_image_path_by_id(image_id, settings.images_folder)
     if not image_path:
         raise KeyError(f"Image with id '{image_id}' not found.")
 

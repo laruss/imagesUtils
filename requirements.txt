@@ -19,3 +19,4 @@ jsonschema~=4.17.3
 flask-cors~=4.0.0
 imagehash~=4.3.1
 validators~=0.21.2
+pytest~=7.4.0

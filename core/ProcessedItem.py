@@ -33,7 +33,7 @@ class ProcessedItem(BaseModel):
         """
         from core.images_utils import get_image_path_by_id
 
-        return get_image_path_by_id(self.id)
+        return get_image_path_by_id(self.id, self._settings.core.images_folder)
 
     def io_image(self, url: str = None) -> BinaryIO:
         """
@@ -196,7 +196,7 @@ class ProcessedItem(BaseModel):
         """
         from core.images_utils import delete_image_data
 
-        delete_image_data(self.id)
+        delete_image_data(self.id, self._settings.core.images_folder, self._settings.core.data_file)
         self._is_deleted = True
         logger.info(f"Image data for '{self.id}' successfully deleted.")
 
