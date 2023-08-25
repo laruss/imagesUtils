@@ -111,13 +111,21 @@ class DescriptionUtils:
             return False
 
     @staticmethod
-    def gpt2json(item: ProcessedItem) -> Optional[GPTResponseJSON]:
+    def gpt2json(item: ProcessedItem, fall_if_failed: bool = False) -> Optional[GPTResponseJSON]:
+        """
+        Get GPTResponseJSON from item
+        :param item: ProcessedItem
+        :param fall_if_failed: bool, whether to raise exception if failed
+        :return: GPTResponseJSON or None
+        """
         logger.info(f"Processing item: {item.id}")
 
         try:
             gpt_json = GPTResponseJSON(**json.loads(item.gptText))
         except Exception as e:
             logger.warning(f"Failed to process item, {e}")
+            if fall_if_failed:
+                raise e
             gpt_json = None
 
         logger.info(f"Got gpt json: {gpt_json}")

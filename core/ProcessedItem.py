@@ -95,9 +95,10 @@ class ProcessedItem(BaseModel):
 
         return self.gptText, False
 
-    def gpt2json(self) -> Tuple[Optional[str], bool]:
+    def gpt2json(self, fall_if_failed: bool = False) -> Tuple[Optional[str], bool]:
         """
         Get gpt2json
+        :param fall_if_failed: bool, whether to raise exception if gpt2json was not generated
         :return: gpt2json, bool whether json was generated
         """
         if not self._settings.description.gpt_settings.use_prompt_schema:
@@ -106,7 +107,7 @@ class ProcessedItem(BaseModel):
             return None, False
 
         if not self.gptJSON:
-            self.gptJSON = self.description_utils.gpt2json(self)
+            self.gptJSON = self.description_utils.gpt2json(self, fall_if_failed)
             self.save()
 
             if self.gptJSON:

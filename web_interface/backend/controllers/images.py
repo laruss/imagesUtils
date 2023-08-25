@@ -102,7 +102,7 @@ def optimize_image(image_id: str):
 
 
 def gpt2json(image_id: str):
-    get_image_model(image_id).gpt2json()
+    get_image_model(image_id).gpt2json(fall_if_failed=True)
 
 
 def cartoonize(image_id: str):
