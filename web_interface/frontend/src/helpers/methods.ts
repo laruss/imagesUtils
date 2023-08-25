@@ -7,9 +7,11 @@ export const areObjectsEqual = (obj1: {[key:string]: any}, obj2: {[key:string]: 
 };
 
 export const getUniqueId = (otherIds: string[]) => {
+    const otherIdsIsArray = Array.isArray(otherIds);
     while (true) {
         const uniqueId = String(Date.now());
-        if (!otherIds.includes(uniqueId)) return uniqueId;
+        console.log(otherIds);
+        if (!otherIdsIsArray || !otherIds.includes(uniqueId)) return uniqueId;
     }
 };
 

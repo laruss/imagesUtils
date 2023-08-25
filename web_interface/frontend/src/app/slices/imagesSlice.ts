@@ -39,9 +39,10 @@ export const imagesSlice = createSlice({
         },
         addEmptyImage: (state, action) => {
             const uniqueId = getUniqueId(state.images);
+            const images = Array.isArray(state.images) ? [...state.images] : [];
             return {
                 ...state,
-                images: [...state.images, uniqueId],
+                images: [...images, uniqueId],
                 currentImage: uniqueId,
                 currentImageData: {},
                 changedImageData: {},
