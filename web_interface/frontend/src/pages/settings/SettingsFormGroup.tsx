@@ -13,7 +13,7 @@ const SettingsFormGroup = (props: FieldTemplateProps) => {
     };
 
     return (
-        <div onClick={onClick}  className={'here-i-am'}>
+        <div onClick={onClick}>
             {isToggle && !isOpen && <Typography style={{cursor: 'pointer'}} variant={'h5'}>{props.label} ▼</Typography>}
             <div style={{display: (isOpen || !isToggle) ? 'block': 'none'}}>
                 {props.children}
