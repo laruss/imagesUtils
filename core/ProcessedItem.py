@@ -77,9 +77,10 @@ class ProcessedItem(BaseModel):
 
         return self.description, False
 
-    def gpt(self) -> Tuple[Optional[str], bool]:
+    def gpt(self, fall_if_failed: bool = False) -> Tuple[Optional[str], bool]:
         """
         Process image by gpt
+        :param fall_if_failed: bool, whether to raise exception if gpt text was not generated
         :return: gpt text, bool whether gpt text was generated
         """
         from description.gpt import gpt
@@ -87,7 +88,7 @@ class ProcessedItem(BaseModel):
         gpt_settings = self._settings.description.gpt_settings
 
         if not self.gptText or not gpt_settings.skip_gpt_if_gpted:
-            self.gptText = gpt(self, gpt_settings)
+            self.gptText = gpt(self, gpt_settings, fall_if_failed)
             self.save()
 
             if self.gptText:

@@ -73,7 +73,10 @@ def generate_image_description(image_id):
 @images_bp.route("/<image_id>/gpt", methods=["PUT"])
 @error_handler
 def process_by_gpt(image_id):
-    controller.process_by_gpt(image_id)
+    try:
+        controller.process_by_gpt(image_id)
+    except Exception as e:
+        raise Exception(f"Failed to process image by GPT, {e}. Try again, use another service or use vpn.")
 
     return success_response(message="Image was processed by GPT")
 

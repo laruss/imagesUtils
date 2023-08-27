@@ -56,9 +56,10 @@ def get_image_model(image_id, image_data: dict = None) -> ProcessedItem:
     settings = get_settings()
     data_json = read_json_from_file(settings.core.data_file)
     image_data = image_data or data_json[str(image_id)]
-    image_data.update({"_settings": settings})
+    item = ProcessedItem(**image_data)
+    item._settings = settings
 
-    return ProcessedItem(**image_data)
+    return item
 
 
 def get_image_data(image_id) -> dict:
@@ -85,7 +86,8 @@ def delete_image(image_id: str):
 
 
 def process_by_gpt(image_id: str):
-    gpt_text, result = get_image_model(image_id).gpt()
+    image_model = get_image_model(image_id)
+    gpt_text, result = image_model.gpt(fall_if_failed=True)
 
     if gpt_text is None:
         raise Exception(
