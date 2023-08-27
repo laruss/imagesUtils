@@ -11,6 +11,7 @@ import validator from "@rjsf/validator-ajv8";
 import {IChangeEvent} from "@rjsf/core";
 import useUpdateImageData from "./helpers/useUpdateImageData";
 import useGetImageData from "./helpers/useGetImageData";
+import ArrayField from "../../components/form/ArrayField";
 
 interface ImageFormProps {
     imageId: string;
@@ -31,6 +32,8 @@ const ImageForm = ({imageId, newImage}: ImageFormProps) => {
     const onChange = (e: IChangeEvent<any>) => dispatch(changeImageData(e.formData));
     const onSubmit = () => { updateImageData({id: imageId, data: currentImageData}); };
 
+    const fields = { ArrayField };
+
     if (!imageDataSchema || !currentImageData) return null;
 
     return (
@@ -43,6 +46,7 @@ const ImageForm = ({imageId, newImage}: ImageFormProps) => {
                 formData={currentImageData}
                 onChange={onChange}
                 disabled={Boolean(newImage)}
+                fields={fields}
             >
                 <Button disabled/>
             </Form>

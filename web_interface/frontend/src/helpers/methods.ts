@@ -10,7 +10,6 @@ export const getUniqueId = (otherIds: string[]) => {
     const otherIdsIsArray = Array.isArray(otherIds);
     while (true) {
         const uniqueId = String(Date.now());
-        console.log(otherIds);
         if (!otherIdsIsArray || !otherIds.includes(uniqueId)) return uniqueId;
     }
 };
