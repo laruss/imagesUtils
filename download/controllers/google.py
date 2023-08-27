@@ -14,7 +14,7 @@ logger = logging.getLogger()
 def get_items(limit: int = 50, query: str = "people") -> List[ProcessedItem]:
     download_settings = DownloadSettings()
     gis = GoogleImagesSearch(
-        download_settings.google.api_key, download_settings.google.cx
+        download_settings.google.api_key.get_secret_value(), download_settings.google.cx.get_secret_value()
     )
 
     _search_params = {

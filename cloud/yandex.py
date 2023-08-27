@@ -4,7 +4,7 @@ from cloud.settings import CloudSettings
 from core.utils import get_logger
 
 logger = get_logger()
-y = yadisk.YaDisk(token=str(CloudSettings().yandex.api_token))
+y = yadisk.YaDisk(token=str(CloudSettings().yandex.api_token.get_secret_value()))
 
 
 def create_folder_if_not_exists(folder_path: str) -> None:

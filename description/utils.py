@@ -24,7 +24,7 @@ class DescriptionUtils:
         params = {
             "models": sightengine.models,
             "api_user": sightengine.api_user,
-            "api_secret": sightengine.api_secret,
+            "api_secret": sightengine.api_secret.get_secret_value(),
         }
 
         try:
@@ -55,7 +55,7 @@ class DescriptionUtils:
 
         replicate_settings = self.settings.description_settings.replicate
 
-        replicate.default_client.api_token = replicate_settings.api_token
+        replicate.default_client.api_token = replicate_settings.api_token.get_secret_value()
         output = replicate.run(
             replicate_settings.api_model_version, input={"image": io_image}
         )

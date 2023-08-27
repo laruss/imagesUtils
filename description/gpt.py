@@ -20,7 +20,7 @@ def use_gpt(prompt: str, settings: GPTSettings = GPTSettings(), fall_if_failed: 
     """
     import openai
 
-    openai.api_key = settings.openai.api_key
+    openai.api_key = settings.openai.api_key.get_secret_value()
 
     try:
         response = openai.ChatCompletion.create(

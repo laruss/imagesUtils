@@ -14,7 +14,7 @@ def _get_items(query: str = "people", limit: int = 50) -> Result:
     logger.info(f"Getting {limit} items from pexels")
 
     headers = {
-        "Authorization": DownloadSettings().pexels.api_key,
+        "Authorization": DownloadSettings().pexels.api_key.get_secret_value(),
     }
     url = f"https://api.pexels.com/v1/search?query={query}&per_page={limit}"
     response = requests.get(url, headers=headers)
