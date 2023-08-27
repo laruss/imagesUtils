@@ -101,19 +101,20 @@ class ProcessedItem(BaseModel):
         :param fall_if_failed: bool, whether to raise exception if gpt2json was not generated
         :return: gpt2json, bool whether json was generated
         """
+        was_generated = False
         if not self._settings.description.gpt_settings.use_prompt_schema:
             logging.warning("Prompt schema is disabled, gpt2json will return None")
 
-            return None, False
+            return None, was_generated
 
         if not self.gptJSON:
             self.gptJSON = self.description_utils.gpt2json(self, fall_if_failed)
             self.save()
 
             if self.gptJSON:
-                return json.dumps(self.gptJSON.model_dump()), True
+                was_generated = True
 
-        return json.dumps(self.gptJSON.model_dump()), False
+        return json.dumps(self.gptJSON.model_dump(mode='json')), was_generated
 
     @property
     def optimize_utils(self):
