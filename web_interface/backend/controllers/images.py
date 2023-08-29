@@ -78,7 +78,7 @@ def set_image_data(image_id, data):
 
 
 def generate_image_description(image_id: str):
-    get_image_model(image_id).describe()
+    get_image_model(image_id).describe(fall_if_failed=True)
 
 
 def delete_image(image_id: str):

@@ -77,7 +77,13 @@ class DescriptionUtils:
 
         return processor.decode(out[0], skip_special_tokens=True)
 
-    def describe(self, item: ProcessedItem) -> Optional[str]:
+    def describe(self, item: ProcessedItem, fall_if_failed: bool = False) -> Optional[str]:
+        """
+        Describe item
+        :param item: ProcessedItem
+        :param fall_if_failed: bool, whether to raise exception if failed
+        :return: str or None
+        """
         method = self.__getattribute__(
             f"_describe_item_{self.settings.description_settings.engine.name}"
         )
@@ -88,6 +94,8 @@ class DescriptionUtils:
             result: Optional[str] = method(item.io_image())
         except Exception as e:
             logger.warning(f"Failed to describe item, {e}")
+            if fall_if_failed:
+                raise e
             result = None
 
         logger.info(f"Got description: {result}")
@@ -119,9 +127,10 @@ class DescriptionUtils:
         :return: GPTResponseJSON or None
         """
         logger.info(f"Processing item: {item.id}")
+        gptText = item.gptText.replace("'", '"')
 
         try:
-            gpt_json = GPTResponseJSON(**json.loads(item.gptText))
+            gpt_json = GPTResponseJSON(**json.loads(gptText))
         except Exception as e:
             logger.warning(f"Failed to process item, {e}")
             if fall_if_failed:

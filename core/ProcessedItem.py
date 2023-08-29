@@ -65,13 +65,14 @@ class ProcessedItem(BaseModel):
 
         return duplicates
 
-    def describe(self) -> Tuple[str, bool]:
+    def describe(self, fall_if_failed: bool = False) -> Tuple[str, bool]:
         """
         Describe image
+        :param fall_if_failed: bool, whether to raise exception if description was not generated
         :return: description, bool whether description was generated
         """
         if not self.description:
-            self.description = self.description_utils.describe(self)
+            self.description = self.description_utils.describe(self, fall_if_failed)
             self.save()
             return self.description, True
 

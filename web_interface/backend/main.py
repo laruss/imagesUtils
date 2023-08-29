@@ -5,10 +5,10 @@ import flask
 from flask import send_from_directory
 from flask_cors import CORS
 
-from web_interface.backend.routes.api import api_bp
+from routes.api import api_bp
 
-from web_interface.backend import settings
-from web_interface.backend.settings import static_folder
+import settings
+from settings import static_folder
 
 app = flask.Flask(__name__)
 CORS(app)
